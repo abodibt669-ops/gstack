@@ -41,7 +41,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { spawn } from "child_process";
+import { openBrowser as openBrowserShared } from "./open-browser";
 
 export interface ServeOptions {
   html: string;
@@ -239,34 +239,9 @@ export async function serve(options: ServeOptions): Promise<void> {
 }
 
 /**
- * Open a URL in the user's default browser.
- * Handles macOS (open), Linux (xdg-open), and headless environments.
+ * Open a URL in the user's default browser, with the SERVE_BROWSER_*
+ * stderr telemetry this server's contract documents.
  */
 function openBrowser(url: string): void {
-  const platform = process.platform;
-  let cmd: string;
-
-  if (platform === "darwin") {
-    cmd = "open";
-  } else if (platform === "linux") {
-    cmd = "xdg-open";
-  } else {
-    // Windows or unknown — just print the URL
-    console.error(`SERVE_BROWSER_MANUAL: url=${url}`);
-    console.error(`Open this URL in your browser: ${url}`);
-    return;
-  }
-
-  try {
-    const child = spawn(cmd, [url], {
-      stdio: "ignore",
-      detached: true,
-    });
-    child.unref();
-    console.error(`SERVE_BROWSER_OPENED: url=${url}`);
-  } catch {
-    // open/xdg-open not available (headless CI environment)
-    console.error(`SERVE_BROWSER_MANUAL: url=${url}`);
-    console.error(`Open this URL in your browser: ${url}`);
-  }
+  openBrowserShared(url, { telemetry: true });
 }

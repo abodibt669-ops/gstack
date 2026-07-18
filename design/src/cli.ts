@@ -31,7 +31,7 @@ import {
   publishBoard,
   shutdownDaemon,
 } from "./daemon-client";
-import { spawn as nodeSpawn } from "child_process";
+import { openBrowser } from "./open-browser";
 
 function parseArgs(argv: string[]): {
   command: string;
@@ -358,24 +358,6 @@ async function publishToDaemon(opts: { html: string; title?: string }): Promise<
   console.log(JSON.stringify({ id: result.id, url: result.url, sourceDir: result.sourceDir }, null, 2));
   openBrowser(result.url);
   // Short-lived publisher process exits; daemon keeps serving.
-}
-
-/** Open a URL in the default browser. Stays cross-platform with serve.ts. */
-function openBrowser(url: string): void {
-  const platform = process.platform;
-  let cmd: string;
-  if (platform === "darwin") cmd = "open";
-  else if (platform === "linux") cmd = "xdg-open";
-  else {
-    console.error(`Open this URL in your browser: ${url}`);
-    return;
-  }
-  try {
-    const child = nodeSpawn(cmd, [url], { stdio: "ignore", detached: true });
-    child.unref();
-  } catch {
-    console.error(`Open this URL in your browser: ${url}`);
-  }
 }
 
 /**
