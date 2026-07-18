@@ -49,6 +49,8 @@ const MAX_START_WAIT_MS = parseInt(
 );
 const POLL_INTERVAL_MS = 100;
 const SIGTERM_GRACE_MS = 2000;
+const SHUTDOWN_POST_TIMEOUT_MS = 2000;
+const ALIVE_POLL_INTERVAL_MS = 50;
 
 export interface EnsureDaemonOptions {
   /** Default: package version. Used for version-match check. */
@@ -316,7 +318,7 @@ async function gracefulShutdownExistingDaemon(port: number): Promise<void> {
   try {
     await fetch(`http://127.0.0.1:${port}/shutdown`, {
       method: "POST",
-      signal: AbortSignal.timeout(2000),
+      signal: AbortSignal.timeout(SHUTDOWN_POST_TIMEOUT_MS),
     });
   } catch {
     // Daemon may have already exited or be unresponsive — fall through
@@ -353,7 +355,7 @@ async function killByPidWithIdentity(
   const deadline = Date.now() + SIGTERM_GRACE_MS;
   while (Date.now() < deadline) {
     if (!isProcessAlive(pid)) return;
-    await delay(50);
+    await delay(ALIVE_POLL_INTERVAL_MS);
   }
   if (isProcessAlive(pid) && verifyIdentity(pid, marker || CMDLINE_MARKER)) {
     log(verbose, `pid ${pid} survived SIGTERM; SIGKILL`);
