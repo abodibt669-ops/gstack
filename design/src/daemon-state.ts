@@ -18,6 +18,12 @@ export interface DaemonState {
   port: number;
   startedAt: string; // ISO 8601
   version: string;
+  /**
+   * Forensic only — never read by production code. Records which script
+   * the daemon booted from (process.argv[1]) so a human inspecting a
+   * stale/confusing .gstack/design.json can tell a source-tree daemon
+   * from a compiled-binary one.
+   */
   serverPath: string;
   cmdlineMarker: string;
 }
