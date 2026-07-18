@@ -318,17 +318,21 @@ feedback-roundtrip-daemon 4 = 77 (+10 from initial ship). Specifically:
 - Malformed-JSON + non-object + array-body + missing-html negatives for
   `POST /api/boards` and `POST /boards/<id>/api/reload`.
 
-### P3: Minor maintainability nits from /ship review
+### ✅ DONE: Minor maintainability nits from /ship review
 
-- `design/src/cli.ts` and `design/src/serve.ts` both have a small `openBrowser`
-  helper with identical darwin/linux/else branches. Extract a shared
-  `design/src/open-browser.ts`.
-- `design/src/daemon-client.ts:320` (`AbortSignal.timeout(2000)`) and `:357`
-  (`delay(50)`) use bare numeric literals while sibling timeouts are named
-  constants. Promote to `SHUTDOWN_POST_TIMEOUT_MS` and `ALIVE_POLL_INTERVAL_MS`.
-- `design/src/daemon-state.ts:21` `serverPath` field is written
-  (`daemon.ts:541`) but never read by production code. Either remove or
-  document the forensic intent.
+**Resolved (branch `claude/todo-implementation-685crd`):** All three nits fixed.
+
+- `openBrowser` extracted to a shared `design/src/open-browser.ts`; `cli.ts` and
+  `serve.ts` both import it. serve.ts's `SERVE_BROWSER_OPENED` / `SERVE_BROWSER_MANUAL`
+  stderr telemetry (documented in `docs/designs/DESIGN_SHOTGUN.md`) is preserved
+  behind a `telemetry` option; the cli.ts daemon-publish path keeps its plain
+  fallback message.
+- `daemon-client.ts` bare literals promoted to `SHUTDOWN_POST_TIMEOUT_MS` (2000)
+  and `ALIVE_POLL_INTERVAL_MS` (50).
+- `daemon-state.ts` `serverPath` kept and documented as forensic-only (removing
+  it would touch the interface, `daemon.ts`, and test fixtures for no benefit;
+  "which script did this daemon boot from" is useful when inspecting a stale
+  `.gstack/design.json`).
 
 ### P3: Daemon scope deferred from v1.45.0.0 plan
 
