@@ -23,7 +23,11 @@ body {
   display: inline-block; border: none; cursor: pointer;
   border-radius: 4px; font-weight: bold; font-family: inherit;
   text-decoration: none; padding: 10px 18px; font-size: .9rem;
+  line-height: 1.2;
 }
+/* Cancel/Delete are <button>s inside their own little POST form now, so the
+   form must not add a line break or spacing that the old <a> did not. */
+.inline-form { display: inline; }
 .btn:hover { opacity: .9; }
 .btn-sm { padding: 6px 14px; font-size: .8rem; }
 .btn-primary { background: #1f9d55; color: #fff; }
@@ -37,7 +41,12 @@ body {
 .hero p  { margin: 10px 0 22px; max-width: 500px; color: #ddd; }
 
 .section { padding: 40px 0; }
+/* Each page's main heading is an <h1> so screen readers and search engines can
+   tell what the page is about. These rules keep it looking the same size it
+   did when it was an <h2>. */
 .section-title { font-size: 1.3rem; margin-bottom: 18px; }
+.form-card h1 { font-size: 1.3rem; }
+.card h2 { font-size: 1.1rem; }
 .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 
 .card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 18px; }
@@ -50,7 +59,7 @@ body {
 .court-card .price { font-weight: bold; font-size: 1.1rem; }
 .court-card .price span { font-weight: normal; font-size: .8rem; color: #666; }
 .court-card .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
-.badge-maint { color: #b7791f; font-weight: bold; font-size: .85rem; }
+.badge-maint { color: #8a5a00; font-weight: bold; font-size: .85rem; }
 
 .filter-bar {
   display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px;
@@ -65,6 +74,8 @@ input, select {
   font-family: inherit; font-size: .9rem; background: #fff;
 }
 input:focus, select:focus { outline: 2px solid #1f9d55; }
+/* Keyboard users need to see where they are, on links and buttons too. */
+a:focus-visible, button:focus-visible { outline: 2px solid #1f9d55; outline-offset: 2px; }
 .form-actions { margin-top: 18px; }
 .form-hint { font-size: .82rem; color: #666; margin-top: 12px; }
 
@@ -78,7 +89,7 @@ th, td { padding: 10px 12px; text-align: left; }
 thead th { background: #1f6b3e; color: #fff; font-size: .78rem; text-transform: uppercase; }
 tbody tr { border-top: 1px solid #eee; }
 tbody tr:hover { background: #fafafa; }
-.status-confirmed { color: #1f9d55; font-weight: bold; }
+.status-confirmed { color: #157347; font-weight: bold; }
 .status-cancelled { color: #c0392b; font-weight: bold; }
 .row-actions { display: flex; gap: 6px; }
 
@@ -97,3 +108,12 @@ tbody tr:hover { background: #fafafa; }
   .hero { padding: 40px 0; }
   .footer-inner { flex-direction: column; text-align: center; }
 }
+
+/* A keyboard user should be able to jump past the navigation instead of tabbing
+   through it on every page. Hidden until it is focused. */
+.skip-link {
+  position: absolute; left: -9999px;
+  background: #fff; color: #1f6b3e; font-weight: bold;
+  padding: 10px 16px; border-radius: 0 0 4px 0; z-index: 10;
+}
+.skip-link:focus { left: 0; top: 0; }
