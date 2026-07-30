@@ -1,64 +1,84 @@
 <?php
 // admin/edit_court.php — EDIT COURT (logic). Fills templates/admin/edit_court.html.
-require_once '../config/db.php';
-require_once '../includes/auth.php';
-require_once '../includes/template.php';
-requireAdmin();
+require_once __DIR__ . '/../bootstrap.php';
+requireAdmin('../');
 
 $error = '';
 $id = (int)($_GET['id'] ?? $_POST['court_id'] ?? 0);
 
-$stmt = $conn->prepare("SELECT * FROM courts WHERE court_id = ?");
+$stmt = $conn->prepare("SELECT court_id, name, sport_type, location, price_per_hour, status FROM courts WHERE court_id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $court = $stmt->get_result()->fetch_assoc();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $court) {
-    $name  = trim($_POST['name']);
-    $sport = $_POST['sport_type'];
-    $loc   = trim($_POST['location']);
-    $price = (float)$_POST['price_per_hour'];
-    $stat  = $_POST['status'];
+// What the form shows: the submitted values if this is a rejected save, so the
+// admin does not lose their typing, otherwise what is stored.
+$name  = $court['name'] ?? '';
+$sport = $court['sport_type'] ?? SPORTS[0];
+$loc   = $court['location'] ?? '';
+$price = $court['price_per_hour'] ?? '';
+$stat  = $court['status'] ?? 'available';
 
-    if ($price <= 0) {
-        $error = "Price must be greater than zero.";
+if (isPost() && $court) {
+    csrf_check();
+    $name  = input($_POST, 'name');
+    $sport = input($_POST, 'sport_type');
+    $loc   = input($_POST, 'location');
+    $price = input($_POST, 'price_per_hour');
+    $stat  = input($_POST, 'status');
+
+    if ($name === '' || mb_strlen($name) > 100) {
+        $error = "Court name is required (up to 100 characters).";
+    } elseif (!valid_choice($sport, SPORTS)) {
+        $error = "Please choose a sport from the list.";
+    } elseif ($loc === '' || mb_strlen($loc) > 150) {
+        $error = "Location is required (up to 150 characters).";
+    } elseif (!is_numeric($price) || (float)$price <= 0 || (float)$price > 999999) {
+        $error = "Price must be a number greater than zero.";
+    } elseif (!valid_choice($stat, COURT_STATUSES)) {
+        $error = "Please choose a valid status.";
     } else {
+        $priceValue = round((float)$price, 2);
         $upd = $conn->prepare(
             "UPDATE courts SET name=?, sport_type=?, location=?, price_per_hour=?, status=? WHERE court_id=?"
         );
-        $upd->bind_param("sssdsi", $name, $sport, $loc, $price, $stat, $id);
+        $upd->bind_param("sssdsi", $name, $sport, $loc, $priceValue, $stat, $id);
         $upd->execute();
-        header("Location: dashboard.php?msg=" . urlencode("Court updated."));
-        exit;
+
+        // Changing the price does not rewrite what existing customers were
+        // already quoted: each booking keeps the total it was made at.
+        flash('success', "Court updated.");
+        redirect('dashboard.php');
     }
 }
 
 if (!$court) {
     $content = view('partials/message.html', [
-        'body' => alert_error('Court not found. <a href="dashboard.php">Back</a>.'),
+        'body' => alert_error(raw('Court not found. <a href="dashboard.php">Back</a>.')),
     ]);
 } else {
     // sport options with the current one selected
     $sportOptions = '';
-    foreach (['Football','Padel','Basketball','Volleyball','Tennis'] as $s) {
-        $sel = $court['sport_type'] === $s ? ' selected' : '';
-        $sportOptions .= '<option value="' . $s . '"' . $sel . '>' . $s . '</option>';
+    foreach (SPORTS as $s) {
+        $sel = $sport === $s ? ' selected' : '';
+        $sportOptions .= '<option value="' . e($s) . '"' . $sel . '>' . e($s) . '</option>';
     }
     // status options with the current one selected
     $statusOptions = '';
-    foreach (['available' => 'Available', 'maintenance' => 'Maintenance'] as $val => $label) {
-        $sel = $court['status'] === $val ? ' selected' : '';
-        $statusOptions .= '<option value="' . $val . '"' . $sel . '>' . $label . '</option>';
+    foreach (COURT_STATUSES as $val => $label) {
+        $sel = $stat === $val ? ' selected' : '';
+        $statusOptions .= '<option value="' . e($val) . '"' . $sel . '>' . e($label) . '</option>';
     }
 
     $content = view('admin/edit_court.html', [
         'id'             => $court['court_id'],
-        'name'           => htmlspecialchars($court['name']),
-        'location'       => htmlspecialchars($court['location']),
-        'price'          => $court['price_per_hour'],
-        'sport_options'  => $sportOptions,
-        'status_options' => $statusOptions,
+        'name'           => $name,
+        'location'       => $loc,
+        'price'          => $price,
+        'sport_options'  => raw($sportOptions),
+        'status_options' => raw($statusOptions),
         'alerts'         => $error ? alert_error($error) : '',
+        'csrf'           => csrf_field(),
     ]);
 }
 

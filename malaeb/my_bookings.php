@@ -1,21 +1,34 @@
 <?php
 // my_bookings.php — MY BOOKINGS (logic). Fills templates/my_bookings.html.
-require_once 'config/db.php';
-require_once 'includes/auth.php';
-require_once 'includes/template.php';
+require_once __DIR__ . '/bootstrap.php';
 requireLogin();
 
-$msg = '';
-if (isset($_GET['cancel'])) {
-    $bid = (int)$_GET['cancel'];
-    $stmt = $conn->prepare("UPDATE bookings SET status = 'cancelled' WHERE booking_id = ? AND user_id = ?");
+// Cancelling used to be a plain link: my_bookings.php?cancel=7. Any other site
+// could then cancel a logged-in customer's booking just by putting
+// <img src="http://localhost/malaeb/my_bookings.php?cancel=7"> on a page they
+// visit — the browser sends the session cookie along without being asked.
+// Now it is a POST carrying a token only our own pages know.
+if (isPost() && input($_POST, 'action') === 'cancel') {
+    csrf_check();
+    $bid = (int)($_POST['booking_id'] ?? 0);
+    $stmt = $conn->prepare(
+        "UPDATE bookings SET status = 'cancelled'
+         WHERE booking_id = ? AND user_id = ? AND status = 'confirmed'"
+    );
     $stmt->bind_param("ii", $bid, $_SESSION['user_id']);
     $stmt->execute();
-    $msg = $stmt->affected_rows ? "Booking cancelled." : "";
+
+    // Say something either way. The old code showed a blank message when the
+    // cancel did nothing, so a failed cancel looked identical to a page reload.
+    $stmt->affected_rows
+        ? flash('success', "Booking cancelled.")
+        : flash('error', "That booking could not be cancelled. It may already be cancelled.");
+    redirect('my_bookings.php');
 }
 
 $stmt = $conn->prepare(
-    "SELECT b.*, c.name AS court_name, c.sport_type
+    "SELECT b.booking_id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status,
+            c.name AS court_name, c.sport_type
      FROM bookings b JOIN courts c ON c.court_id = b.court_id
      WHERE b.user_id = ? ORDER BY b.booking_date DESC, b.start_time"
 );
@@ -23,35 +36,46 @@ $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $bookings = $stmt->get_result();
 
+$today = (new DateTimeImmutable('today'))->format('Y-m-d');
+
 if ($bookings->num_rows === 0) {
     $body = view('my_bookings_empty.html');
 } else {
     $rows = '';
     while ($b = $bookings->fetch_assoc()) {
-        if ($b['status'] === 'confirmed') {
+        // A booking whose date has passed cannot be edited or cancelled, and
+        // saying so beats offering buttons that only produce an error.
+        $isPast = $b['booking_date'] < $today;
+
+        if ($b['status'] === 'confirmed' && !$isPast) {
             $actions = '<div class="row-actions">'
-                . '<a class="btn btn-dark btn-sm" href="edit_booking.php?id=' . $b['booking_id'] . '">Edit</a>'
-                . '<a class="btn btn-danger btn-sm" href="my_bookings.php?cancel=' . $b['booking_id'] . '" data-confirm="Cancel this booking?">Cancel</a>'
+                . '<a class="btn btn-dark btn-sm" href="edit_booking.php?id=' . (int)$b['booking_id'] . '">Edit</a>'
+                . post_button('my_bookings.php',
+                    ['action' => 'cancel', 'booking_id' => $b['booking_id']],
+                    'Cancel', 'btn btn-danger btn-sm', 'Cancel this booking?')->html
                 . '</div>';
+        } elseif ($b['status'] === 'confirmed') {
+            $actions = '<span class="muted">Past</span>';
         } else {
             $actions = '<span class="muted">-</span>';
         }
+
         $rows .= view('partials/booking_row.html', [
-            'court_name'   => htmlspecialchars($b['court_name']),
-            'sport'        => htmlspecialchars($b['sport_type']),
-            'date'         => htmlspecialchars($b['booking_date']),
-            'time'         => substr($b['start_time'],0,5) . ' - ' . substr($b['end_time'],0,5),
-            'total'        => number_format($b['total_price'], 2),
+            'court_name'   => $b['court_name'],
+            'sport'        => $b['sport_type'],
+            'date'         => $b['booking_date'],
+            'time'         => substr($b['start_time'], 0, 5) . ' - ' . substr($b['end_time'], 0, 5),
+            'total'        => number_format((float)$b['total_price'], 2),
             'status_class' => $b['status'],
             'status'       => ucfirst($b['status']),
-            'actions'      => $actions,
-        ]);
+            'actions'      => raw($actions),
+        ])->html;
     }
-    $body = view('my_bookings_table.html', ['rows' => $rows]);
+    $body = view('my_bookings_table.html', ['rows' => raw($rows)]);
 }
 
 $content = view('my_bookings.html', [
-    'alerts' => $msg ? alert_success($msg) : '',
+    'alerts' => take_flash(),
     'body'   => $body,
 ]);
 

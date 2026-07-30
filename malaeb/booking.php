@@ -1,49 +1,70 @@
 <?php
 // booking.php — CREATE A BOOKING (logic). Fills templates/booking.html.
-require_once 'config/db.php';
-require_once 'includes/auth.php';
-require_once 'includes/template.php';
+require_once __DIR__ . '/bootstrap.php';
 requireLogin();
 
-$success = $error = '';
+$error = '';
 
 $courtId = (int)($_GET['court_id'] ?? $_POST['court_id'] ?? 0);
-$stmt = $conn->prepare("SELECT * FROM courts WHERE court_id = ? AND status = 'available'");
+$stmt = $conn->prepare(
+    "SELECT court_id, name, sport_type, location, price_per_hour
+     FROM courts WHERE court_id = ? AND status = 'available'"
+);
 $stmt->bind_param("i", $courtId);
 $stmt->execute();
 $court = $stmt->get_result()->fetch_assoc();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $court) {
-    $date  = $_POST['booking_date'];
-    $start = $_POST['start_time'];
-    $end   = $_POST['end_time'];
+if (isPost() && $court) {
+    csrf_check();
+    $date  = input($_POST, 'booking_date');
+    $start = input($_POST, 'start_time');
+    $end   = input($_POST, 'end_time');
 
-    if ($end <= $start) {
-        $error = "End time must be after start time.";
-    } elseif ($date < date('Y-m-d')) {
-        $error = "You cannot book a date in the past.";
-    } else {
-        $chk = $conn->prepare(
-            "SELECT COUNT(*) AS n FROM bookings
-             WHERE court_id = ? AND booking_date = ? AND status = 'confirmed'
-               AND start_time < ? AND end_time > ?"
-        );
-        $chk->bind_param("isss", $courtId, $date, $end, $start);
-        $chk->execute();
-        $taken = $chk->get_result()->fetch_assoc()['n'] > 0;
+    // One shared rule set, so this page and edit_booking.php cannot drift apart
+    // again. (They had: only this one refused dates in the past.)
+    $error = validate_slot($date, $start, $end);
 
-        if ($taken) {
-            $error = "This time slot is already booked. Please choose another time.";
-        } else {
-            $hours = (strtotime($end) - strtotime($start)) / 3600;
-            $total = round($hours * $court['price_per_hour'], 2);
-            $ins = $conn->prepare(
-                "INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time, total_price)
-                 VALUES (?, ?, ?, ?, ?, ?)"
+    if ($error === '') {
+        $start = normalize_time($start);
+        $end   = normalize_time($end);
+
+        // Checking "is this slot free?" and then inserting are two separate
+        // trips to the database. Two customers booking the same court at the
+        // same moment could both be told the slot was free. Doing both inside
+        // one transaction, with the check locking the rows (and the gap where a
+        // conflicting row would go), makes the second one wait and then lose.
+        $conn->begin_transaction();
+        try {
+            $chk = $conn->prepare(
+                "SELECT COUNT(*) AS n FROM bookings
+                 WHERE court_id = ? AND booking_date = ? AND status = 'confirmed'
+                   AND start_time < ? AND end_time > ?
+                 FOR UPDATE"
             );
-            $ins->bind_param("iisssd", $_SESSION['user_id'], $courtId, $date, $start, $end, $total);
-            $ins->execute();
-            $success = "Booking confirmed! Total: {$total} SAR. See it in My Bookings.";
+            $chk->bind_param("isss", $courtId, $date, $end, $start);
+            $chk->execute();
+
+            if ((int)$chk->get_result()->fetch_assoc()['n'] > 0) {
+                $conn->rollback();
+                $error = "This time slot is already booked. Please choose another time.";
+            } else {
+                $total = round(slot_hours($start, $end) * (float)$court['price_per_hour'], 2);
+                $ins = $conn->prepare(
+                    "INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time, total_price)
+                     VALUES (?, ?, ?, ?, ?, ?)"
+                );
+                $ins->bind_param("iisssd", $_SESSION['user_id'], $courtId, $date, $start, $end, $total);
+                $ins->execute();
+                $conn->commit();
+
+                flash('success', "Booking confirmed! Total: " . number_format($total, 2) . " SAR. See it in My Bookings.");
+                // Redirect after a successful POST so a refresh reloads the page
+                // instead of trying to book the same slot again.
+                redirect('booking.php?court_id=' . $courtId);
+            }
+        } catch (mysqli_sql_exception $e) {
+            $conn->rollback();
+            throw $e;
         }
     }
 }
@@ -51,21 +72,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $court) {
 if (!$court) {
     // no court found -> show a message page
     $content = view('partials/message.html', [
-        'body' => alert_error('Court not found or unavailable. <a href="courts.php">Back to courts</a>.'),
+        'body' => alert_error(raw('Court not found or unavailable. <a href="courts.php">Back to courts</a>.')),
     ]);
 } else {
-    $alerts = '';
-    if ($success) $alerts .= alert_success($success);
-    if ($error)   $alerts .= alert_error($error);
+    $alerts = take_flash()->html;
+    if ($error) $alerts .= alert_error($error)->html;
 
     $content = view('booking.html', [
-        'sport'    => htmlspecialchars($court['sport_type']),
-        'name'     => htmlspecialchars($court['name']),
-        'location' => htmlspecialchars($court['location']),
-        'price'    => number_format($court['price_per_hour'], 0),
+        'sport'    => $court['sport_type'],
+        'name'     => $court['name'],
+        'location' => $court['location'],
+        'price'    => number_format((float)$court['price_per_hour'], 0),
         'rate'     => $court['price_per_hour'],
         'court_id' => $court['court_id'],
-        'alerts'   => $alerts,
+        'max_date' => (new DateTimeImmutable('today'))->modify('+' . MAX_BOOKING_DAYS_AHEAD . ' days')->format('Y-m-d'),
+        'alerts'   => raw($alerts),
+        'csrf'     => csrf_field(),
     ]);
 }
 
