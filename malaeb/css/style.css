@@ -1,0 +1,99 @@
+/* Malaeb - basic styling */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: Arial, "Segoe UI", sans-serif;
+  background: #f4f4f4;
+  color: #222;
+  line-height: 1.5;
+}
+
+.container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+.muted { color: #666; }
+
+.site-header { background: #1f6b3e; border-bottom: 3px solid #145029; }
+.nav { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { color: #fff; font-weight: bold; font-size: 1.3rem; text-decoration: none; }
+.nav-links { display: flex; align-items: center; gap: 18px; list-style: none; }
+.nav-links a { color: #eee; text-decoration: none; font-weight: 600; font-size: .9rem; }
+.nav-links a:hover { text-decoration: underline; }
+
+.btn {
+  display: inline-block; border: none; cursor: pointer;
+  border-radius: 4px; font-weight: bold; font-family: inherit;
+  text-decoration: none; padding: 10px 18px; font-size: .9rem;
+}
+.btn:hover { opacity: .9; }
+.btn-sm { padding: 6px 14px; font-size: .8rem; }
+.btn-primary { background: #1f9d55; color: #fff; }
+.btn-outline { background: transparent; color: #fff; border: 1px solid #fff; }
+.btn-dark    { background: #1f6b3e; color: #fff; }
+.btn-danger  { background: #c0392b; color: #fff; }
+
+.hero { background: #1f6b3e; color: #fff; padding: 50px 0; }
+.hero h1 { font-size: 2.2rem; margin-bottom: 12px; max-width: 600px; }
+.hero h1 em { font-style: normal; }
+.hero p  { margin: 10px 0 22px; max-width: 500px; color: #ddd; }
+
+.section { padding: 40px 0; }
+.section-title { font-size: 1.3rem; margin-bottom: 18px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+.card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 18px; }
+.court-card .sport-tag {
+  display: inline-block; font-size: .75rem; font-weight: bold; text-transform: uppercase;
+  background: #e4f5ec; color: #1f6b3e; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px;
+}
+.court-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
+.court-card .loc { font-size: .88rem; color: #666; margin-bottom: 10px; }
+.court-card .price { font-weight: bold; font-size: 1.1rem; }
+.court-card .price span { font-weight: normal; font-size: .8rem; color: #666; }
+.court-card .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.badge-maint { color: #b7791f; font-weight: bold; font-size: .85rem; }
+
+.filter-bar {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px;
+  background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px;
+}
+.filter-bar select, .filter-bar input { flex: 1; min-width: 150px; }
+
+.form-card { max-width: 450px; margin: 40px auto; }
+label { display: block; font-weight: bold; font-size: .85rem; margin: 12px 0 5px; }
+input, select {
+  width: 100%; padding: 9px 11px; border: 1px solid #ccc; border-radius: 4px;
+  font-family: inherit; font-size: .9rem; background: #fff;
+}
+input:focus, select:focus { outline: 2px solid #1f9d55; }
+.form-actions { margin-top: 18px; }
+.form-hint { font-size: .82rem; color: #666; margin-top: 12px; }
+
+.alert { padding: 11px 14px; border-radius: 4px; font-weight: 600; margin: 16px 0; font-size: .9rem; }
+.alert-success { background: #e4f5ec; color: #1f6b3e; border: 1px solid #bfe6d0; }
+.alert-error   { background: #fdecea; color: #c0392b; border: 1px solid #f5c6c0; }
+
+.table-wrap { overflow-x: auto; background: #fff; border: 1px solid #ddd; border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+th, td { padding: 10px 12px; text-align: left; }
+thead th { background: #1f6b3e; color: #fff; font-size: .78rem; text-transform: uppercase; }
+tbody tr { border-top: 1px solid #eee; }
+tbody tr:hover { background: #fafafa; }
+.status-confirmed { color: #1f9d55; font-weight: bold; }
+.status-cancelled { color: #c0392b; font-weight: bold; }
+.row-actions { display: flex; gap: 6px; }
+
+.stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 26px; }
+.stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 16px; }
+.stat .num { font-size: 1.7rem; font-weight: bold; color: #1f6b3e; }
+.stat .lbl { font-size: .82rem; color: #666; }
+
+.site-footer { background: #145029; color: #ddd; margin-top: 50px; }
+.footer-inner { padding: 22px 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.site-footer strong { color: #fff; }
+
+@media (max-width: 640px) {
+  .nav { flex-direction: column; height: auto; padding: 10px 0; gap: 8px; }
+  .nav-links { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .hero { padding: 40px 0; }
+  .footer-inner { flex-direction: column; text-align: center; }
+}

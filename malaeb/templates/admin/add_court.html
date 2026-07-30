@@ -1,0 +1,32 @@
+<section class="section container">
+  <div class="card form-card">
+    <h2>Add court</h2>
+    {{alerts}}
+    <form method="POST" action="add_court.php">
+      <label for="name">Court name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="sport_type">Sport</label>
+      <select id="sport_type" name="sport_type" required>
+        {{sport_options}}
+      </select>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" required>
+
+      <label for="price_per_hour">Price per hour (SAR)</label>
+      <input type="number" id="price_per_hour" name="price_per_hour" min="1" step="0.5" required>
+
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="available">Available</option>
+        <option value="maintenance">Maintenance</option>
+      </select>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Add court</button>
+        <a class="btn btn-dark btn-sm" href="dashboard.php">Back</a>
+      </div>
+    </form>
+  </div>
+</section>

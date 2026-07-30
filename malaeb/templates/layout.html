@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{title}}</title>
+<link rel="stylesheet" href="{{base}}css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav container">
+    <a class="brand" href="{{base}}index.php">Malaeb</a>
+    <ul class="nav-links">
+      <li><a href="{{base}}index.php">Home</a></li>
+      <li><a href="{{base}}courts.php">Courts</a></li>
+      {{nav_auth}}
+    </ul>
+  </nav>
+</header>
+<main>
+{{content}}
+</main>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p><strong>MALAEB.</strong> Book your court in seconds.</p>
+    <p class="muted">SWE 322 - Advanced Web Programming Project &copy; 2025</p>
+  </div>
+</footer>
+<script src="{{base}}js/main.js"></script>
+</body>
+</html>

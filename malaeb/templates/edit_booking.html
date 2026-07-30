@@ -1,0 +1,27 @@
+<section class="section container">
+  <div class="card form-card">
+    <h2>Edit booking</h2>
+    <p class="muted">{{court_name}} - {{price}} SAR/hr</p>
+    {{alerts}}
+
+    <form id="bookingForm" method="POST" action="edit_booking.php" data-rate="{{rate}}">
+      <input type="hidden" name="booking_id" value="{{booking_id}}">
+
+      <label for="booking_date">Date</label>
+      <input type="date" id="booking_date" name="booking_date" value="{{date}}" required>
+
+      <label for="start_time">Start time</label>
+      <input type="time" id="start_time" name="start_time" step="1800" value="{{start}}" required>
+
+      <label for="end_time">End time</label>
+      <input type="time" id="end_time" name="end_time" step="1800" value="{{end}}" required>
+
+      <p class="form-hint">Estimated total: <strong id="livePrice">--</strong></p>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save changes</button>
+        <a class="btn btn-dark btn-sm" href="my_bookings.php">Back</a>
+      </div>
+    </form>
+  </div>
+</section>
