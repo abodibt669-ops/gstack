@@ -31,8 +31,26 @@ define('PAYMENTS_MODE', getenv('WAGTI_PAYMENTS_MODE') ?: 'simulate');
 define('MOYASAR_SECRET_KEY',      getenv('MOYASAR_SECRET_KEY')      ?: 'sk_test_REPLACE_ME');
 define('MOYASAR_PUBLISHABLE_KEY', getenv('MOYASAR_PUBLISHABLE_KEY') ?: 'pk_test_REPLACE_ME');
 
-define('MOYASAR_API_BASE', 'https://api.moyasar.com/v1');
+// Overridable so the live-mode path can be pointed at a stub gateway in tests.
+// Without a seam like this, the code that decides whether money moved is the
+// one piece that can only ever be exercised in production.
+define('MOYASAR_API_BASE', getenv('MOYASAR_API_BASE') ?: 'https://api.moyasar.com/v1');
 define('PAYMENT_CURRENCY', 'SAR');
+
+// Where this site lives, e.g. https://wagti.example.com or
+// https://example.com/wagti if it sits in a subfolder. The payment callback
+// URL is built from this.
+//
+// Why it is configured rather than detected: the obvious way to work out our
+// own address is $_SERVER['HTTP_HOST'], but that is just a request header, and
+// the client chooses what to put in it. Someone could send a request carrying
+// another site's host, and the callback URL handed to Moyasar would point
+// there, sending the customer somewhere else after they paid. A value we set
+// ourselves cannot be steered from outside.
+//
+// Left unset it falls back to the request host, which is what makes a local
+// XAMPP install work with no configuration. Set it on any real host.
+define('WAGTI_BASE_URL', rtrim(getenv('WAGTI_BASE_URL') ?: '', '/'));
 
 // A pending (unpaid) booking holds its slot for this many minutes; after
 // that the slot is free again so an abandoned payment can't lock it forever.

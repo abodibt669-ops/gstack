@@ -19,7 +19,7 @@ $bookingId = (int)($_GET['booking_id'] ?? $_POST['booking_id'] ?? 0);
 
 // Load the booking — must belong to the logged-in user.
 $stmt = $conn->prepare(
-    "SELECT booking_id, court_id, booking_date, start_time, end_time, total_price, status
+    "SELECT booking_id, court_id, booking_date, start_time, end_time, total_price, status, payment_ref
      FROM bookings WHERE booking_id = ? AND user_id = ?"
 );
 $stmt->bind_param("ii", $bookingId, $_SESSION['user_id']);
@@ -53,11 +53,28 @@ if (PAYMENTS_MODE !== 'live') {
 }
 
 $expected = payment_amount_halalas($b['total_price']);
-$result   = moyasar_verify_payment($paymentId, $expected);
+
+// The invoice we created for this booking, recorded by pay.php. The payment
+// coming back has to belong to it, or it is not paying for this booking.
+$expectedInvoice = (string)($b['payment_ref'] ?? '');
+$result = moyasar_verify_payment($paymentId, $expected, $expectedInvoice);
 
 if (!$result['paid']) {
-    // Leave the booking pending so the customer can retry from My Bookings.
-    // The slot stays held until the pending window lapses.
+    // Worth a log line either way, but the last three reasons are not a
+    // customer whose card was declined — they are a payment that does not
+    // belong to this booking, which is someone trying it on.
+    $suspicious = in_array($result['reason'], ['wrong_invoice', 'unbound_payment', 'amount_mismatch'], true);
+    error_log(sprintf(
+        '%s payment rejected: booking=%d user=%d reason=%s',
+        $suspicious ? 'SUSPICIOUS' : 'Failed',
+        $bookingId,
+        (int)$_SESSION['user_id'],
+        $result['reason']
+    ));
+
+    // Say the same thing to the customer whichever it was. A rejection message
+    // that distinguishes "declined" from "that payment is not yours" would tell
+    // someone probing exactly which ids are worth trying.
     flash('error', 'Payment was not completed. You can try again from My Bookings.');
     redirect('my_bookings.php');
 }
