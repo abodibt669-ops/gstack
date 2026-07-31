@@ -39,12 +39,7 @@ $stats = $conn->query(
         (SELECT MIN(price_per_hour) FROM courts WHERE status = 'available')                AS from_price"
 )->fetch_assoc();
 
-$registerBtn = isLoggedIn()
-    ? ''
-    : '<a class="btn btn-outline" href="register.php">Create account</a>';
-
 $content = view('index.html', [
-    'register_btn'  => raw($registerBtn),
     'sport_options' => raw($sportOptions),
     'stat_sports'   => (int)$stats['sports'],
     'stat_districts'=> (int)$stats['districts'],
