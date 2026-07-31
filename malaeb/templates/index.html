@@ -1,9 +1,63 @@
 <section class="hero">
-  <div class="container">
-    <h1>Stop calling around.<br><em>Book your court</em> in seconds.</h1>
-    <p>Football, padel, basketball and more - see real availability across Riyadh and reserve your slot instantly.</p>
-    <a class="btn btn-primary" href="courts.php">Browse courts</a>
-    {{register_btn}}
+  <div class="container hero-inner">
+
+    <div class="hero-copy">
+      <p class="hero-eyebrow">Riyadh's sports courts, in one place</p>
+
+      <h1>Book your court<br><em>in seconds.</em></h1>
+
+      <p class="hero-lead">
+        Malaeb is the fastest way to book a sports court near you. Every
+        football, padel, basketball, volleyball and tennis court in one place,
+        so you can compare prices and reserve in a few taps.
+      </p>
+
+      <!-- The quickest thing a first-time visitor can do is search, so the search
+           is the hero. It posts the same sport/price filter courts.php already
+           understands, so the results page needs no special handling. -->
+      <form class="hero-search" method="GET" action="courts.php" role="search" aria-label="Find a court">
+        <div class="hero-field">
+          <label for="hero_sport">Sport</label>
+          <select id="hero_sport" name="sport">
+            <option value="">Any sport</option>
+            {{sport_options}}
+          </select>
+        </div>
+        <div class="hero-field">
+          <label for="hero_max_price">Budget per hour</label>
+          <input type="number" id="hero_max_price" name="max_price" min="0" step="5"
+                 placeholder="Any price" inputmode="numeric">
+        </div>
+        <button class="btn btn-primary hero-submit" type="submit">Find courts</button>
+      </form>
+
+      <p class="hero-reassure">
+        <span aria-hidden="true">&#10003;</span>
+        Confirmed instantly. No phone calls, no waiting for a callback.
+      </p>
+    </div>
+
+    <!-- The three things a first-time visitor needs to believe, stated plainly.
+         The numbers are counted from the courts table at page load, so they stay
+         honest as courts are added rather than being decoration. -->
+    <aside class="hero-panel" aria-label="Why book with Malaeb">
+      <ul class="hero-points">
+        <li>
+          <strong>Every court in one place</strong>
+          <span>{{stat_sports}} sports across {{stat_areas}} districts of Riyadh, from {{stat_from_price}} SAR/hr. Browse and compare without opening a single other tab.</span>
+        </li>
+        <li>
+          <strong>Guaranteed booking</strong>
+          <span>The slot is held for you the second you confirm. No double bookings, no "we'll call you back to check".</span>
+        </li>
+        <li>
+          <strong>Yours to change</strong>
+          <span>See every booking in one list. Move it or cancel it yourself, any time, without ringing the venue.</span>
+        </li>
+      </ul>
+      {{panel_cta}}
+    </aside>
+
   </div>
 </section>
 
@@ -12,4 +66,5 @@
   <div class="grid">
     {{cards}}
   </div>
+  <p class="section-more"><a href="courts.php">See all courts &rarr;</a></p>
 </section>

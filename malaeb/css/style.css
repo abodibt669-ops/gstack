@@ -35,10 +35,83 @@ body {
 .btn-dark    { background: #1f6b3e; color: #fff; }
 .btn-danger  { background: #c0392b; color: #fff; }
 
-.hero { background: #1f6b3e; color: #fff; padding: 50px 0; }
-.hero h1 { font-size: 2.2rem; margin-bottom: 12px; max-width: 600px; }
-.hero h1 em { font-style: normal; }
-.hero p  { margin: 10px 0 22px; max-width: 500px; color: #ddd; }
+/* ---------------------------------------------------------------
+   Hero. Same brand green and same flat, bordered card language as the
+   rest of the site; the change is what sits in it. The old hero used the
+   left half of the screen and left the right half empty, and asked the
+   visitor to read a sentence before they could do anything. Now the first
+   thing in reach is the search, with the promises next to it.
+   --------------------------------------------------------------- */
+.hero {
+  background: #1f6b3e;
+  color: #fff;
+  padding: 56px 0 60px;
+  /* A single soft highlight, in the greens already in the palette, so the
+     band reads as a surface rather than a flat rectangle. */
+  background-image: radial-gradient(760px 420px at 12% -10%, #237a46 0%, rgba(35,122,70,0) 62%);
+  border-bottom: 3px solid #145029;
+}
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 44px;
+  align-items: center;
+}
+
+.hero-eyebrow {
+  font-size: .78rem; font-weight: bold; text-transform: uppercase;
+  letter-spacing: .09em; color: #e4f5ec; margin-bottom: 12px;
+}
+.hero h1 { font-size: 2.5rem; line-height: 1.15; margin-bottom: 14px; }
+.hero h1 em { font-style: normal; color: #9fe3bb; }
+.hero-lead { color: #e4f5ec; max-width: 30rem; margin-bottom: 22px; }
+
+/* The search sits on a white card so it reads as the thing to use, the same
+   card treatment the filter bar on the courts page already uses. */
+.hero-search {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+  background: #fff; border-radius: 6px; padding: 14px;
+  box-shadow: 0 6px 20px rgba(10, 48, 27, .22);
+}
+.hero-field { flex: 1 1 150px; min-width: 0; }
+.hero-field label {
+  color: #4a5a50; font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .05em; margin: 0 0 5px;
+}
+.hero-submit { flex: 0 0 auto; padding: 11px 22px; }
+
+.hero-reassure {
+  margin-top: 14px; font-size: .88rem; font-weight: 600; color: #e4f5ec;
+  display: flex; align-items: baseline; gap: 8px;
+}
+.hero-reassure span { color: #9fe3bb; font-weight: bold; }
+
+/* The three promises. Deliberately plain text on a darker green panel rather
+   than icons or badges, to stay in keeping with the rest of the site. */
+.hero-panel {
+  background: rgba(11, 61, 33, .55);
+  border: 1px solid #3d8a5f;
+  border-radius: 6px;
+  padding: 20px 22px;
+}
+.hero-points { list-style: none; }
+.hero-points li { padding: 13px 0; border-top: 1px solid rgba(255, 255, 255, .13); }
+.hero-points li:first-child { padding-top: 0; border-top: 0; }
+.hero-points li:last-child { padding-bottom: 0; }
+.hero-points strong {
+  display: block; font-size: .97rem; margin-bottom: 3px;
+  /* The tick is drawn in CSS so the markup stays plain HTML. */
+}
+.hero-points strong::before { content: "\2713"; color: #9fe3bb; margin-right: 8px; }
+.hero-points span { display: block; font-size: .86rem; color: #cfe0d5; line-height: 1.45; }
+.hero-panel-cta {
+  margin-top: 18px; padding-top: 15px; font-size: .85rem; color: #cfe0d5;
+  border-top: 1px solid rgba(255, 255, 255, .13);
+}
+.hero-panel-cta a { color: #fff; font-weight: bold; }
+
+.section-more { margin-top: 18px; font-size: .9rem; }
+.section-more a { color: #1f6b3e; font-weight: bold; }
 
 .section { padding: 40px 0; }
 /* Each page's main heading is an <h1> so screen readers and search engines can
@@ -102,10 +175,23 @@ tbody tr:hover { background: #fafafa; }
 .footer-inner { padding: 22px 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .site-footer strong { color: #fff; }
 
+/* The two hero columns stack before they get cramped: the promises panel needs
+   room to stay readable, so it drops under the search rather than squeezing. */
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 28px; }
+  .hero h1 { font-size: 2.2rem; }
+  .hero-lead { max-width: none; }
+}
+
 @media (max-width: 640px) {
   .nav { flex-direction: column; height: auto; padding: 10px 0; gap: 8px; }
   .nav-links { flex-wrap: wrap; justify-content: center; gap: 12px; }
-  .hero { padding: 40px 0; }
+  .hero { padding: 36px 0 40px; }
+  .hero h1 { font-size: 1.95rem; }
+  /* Fields go full width and the button spans the row, so nothing ends up as a
+     narrow tap target on a phone. */
+  .hero-field { flex: 1 1 100%; }
+  .hero-submit { flex: 1 1 100%; }
   .footer-inner { flex-direction: column; text-align: center; }
 }
 
