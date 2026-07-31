@@ -68,3 +68,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// ---- redesign: reveal-on-scroll (progressive enhancement, no dependencies) ----
+// Set synchronously, before first paint: the CSS only hides .reveal items under
+// .js, so that with scripting off they are simply visible rather than stuck at
+// opacity 0 waiting for an observer that will never run.
+document.documentElement.classList.add('js');
+
+document.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll(".reveal");
+  if (!items.length) return;
+  if (!("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    items.forEach((el) => el.classList.add("in"));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add("in"), i * 60);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  items.forEach((el) => io.observe(el));
+});

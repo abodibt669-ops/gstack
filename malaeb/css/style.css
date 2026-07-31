@@ -1,205 +1,182 @@
-/* Malaeb - basic styling */
+/* ============================================================
+   MALAEB — sporty redesign
+   Court-line + scoreboard identity. One stylesheet, every page.
+   ============================================================ */
+@font-face{font-family:'Anton';src:url('../fonts/Anton-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'Barlow';src:url('../fonts/Barlow-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'Barlow';src:url('../fonts/Barlow-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
+@font-face{font-family:'Barlow';src:url('../fonts/Barlow-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
+@font-face{font-family:'Barlow';src:url('../fonts/Barlow-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:'Barlow';src:url('../fonts/Barlow-ExtraBold.ttf') format('truetype');font-weight:800;font-display:swap}
+@font-face{font-family:'Space Mono';src:url('../fonts/SpaceMono-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'Space Mono';src:url('../fonts/SpaceMono-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: Arial, "Segoe UI", sans-serif;
-  background: #f4f4f4;
-  color: #222;
-  line-height: 1.5;
+:root{
+  --chalk:#F1F3EC; --pitch:#0C271F; --pitch-2:#123528; --ink:#0A0F0D;
+  --volt:#D8FB4F; --flare:#FF5B2E; --flare-ink:#C53912; --line:rgba(12,39,31,.14);
+  --football:#17A65A; --padel:#2F6BFF; --basket:#FF7A1A; --volley:#8B5CF6; --tennis:#93C020;
+  /* Text-safe versions of the sport colours. The bright ones above stay on the
+     card's accent bar and glow, where nothing sits on top of them; these are for
+     the sport chip, which is white text on the colour and has to clear WCAG AA.
+     Same --flare / --flare-ink split already used for the orange. */
+  --football-ink:#138649; --padel-ink:#2B68FF; --basket-ink:#C45200;
+  --volley-ink:#8453F5; --tennis-ink:#617F15;
+  --shadow:0 24px 55px -30px rgba(10,15,13,.5);
 }
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Barlow',system-ui,sans-serif;background:var(--chalk);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+h1,h2,h3,.brand,.section-title,.price,.stat .num{font-family:'Anton',Impact,sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.01em;line-height:.95}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
+.muted{color:#6b776f}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--pitch);color:#fff;padding:10px 16px;border-radius:8px;z-index:100}
+.skip-link:focus{left:12px;top:12px}
 
-.container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-.muted { color: #666; }
+/* ---------- NAV ---------- */
+.site-header{position:sticky;top:0;z-index:50;background:rgba(241,243,236,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{font-size:27px;color:var(--pitch);display:flex;align-items:center;gap:10px}
+.brand::before{content:"";width:28px;height:28px;border-radius:7px;background:var(--pitch);
+  background-image:linear-gradient(var(--volt),var(--volt)),radial-gradient(circle,transparent 5px,var(--volt) 5px,var(--volt) 6px,transparent 6px);
+  background-size:2px 100%,100% 100%;background-position:center;background-repeat:no-repeat}
+.nav-links{list-style:none;display:flex;align-items:center;gap:26px}
+.nav-links a{font-weight:600;font-size:15px;position:relative;color:var(--pitch)}
+.nav-links a:not(.btn)::after{content:"";position:absolute;left:0;bottom:-5px;height:2px;width:0;background:var(--flare);transition:width .25s}
+.nav-links a:not(.btn):hover::after{width:100%}
 
-.site-header { background: #1f6b3e; border-bottom: 3px solid #145029; }
-.nav { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-.brand { color: #fff; font-weight: bold; font-size: 1.3rem; text-decoration: none; }
-.nav-links { display: flex; align-items: center; gap: 18px; list-style: none; }
-.nav-links a { color: #eee; text-decoration: none; font-weight: 600; font-size: .9rem; }
-.nav-links a:hover { text-decoration: underline; }
+/* ---------- BUTTONS ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:'Barlow',sans-serif;font-weight:700;font-size:15px;padding:12px 22px;border-radius:11px;cursor:pointer;border:2px solid transparent;transition:transform .18s,box-shadow .2s,background .2s,color .2s;text-transform:none;line-height:1}
+.btn-primary{background:var(--flare-ink);color:#fff;box-shadow:0 10px 24px -12px var(--flare)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 32px -12px var(--flare)}
+.btn-dark{background:var(--pitch);color:var(--chalk)}
+.btn-dark:hover{transform:translateY(-2px);background:var(--pitch-2)}
+.btn-outline{background:transparent;border-color:var(--pitch);color:var(--pitch)}
+.btn-outline:hover{background:var(--pitch);color:var(--chalk)}
+.btn-sm{padding:9px 16px;font-size:14px;border-radius:9px}
 
-.btn {
-  display: inline-block; border: none; cursor: pointer;
-  border-radius: 4px; font-weight: bold; font-family: inherit;
-  text-decoration: none; padding: 10px 18px; font-size: .9rem;
-  line-height: 1.2;
+/* ---------- HERO ---------- */
+.hero{position:relative;overflow:hidden;padding:70px 0 60px;background:var(--chalk)}
+.hero::before{content:"";position:absolute;inset:0;opacity:.42;pointer-events:none;
+  background-image:
+    linear-gradient(var(--pitch),var(--pitch)),
+    linear-gradient(var(--pitch),var(--pitch)),
+    radial-gradient(circle at center,transparent 86px,var(--pitch) 86px,var(--pitch) 88px,transparent 88px);
+  background-size:2px 100%,100% 2px,220px 220px;
+  background-position:right 32% center,center,right 32% center;
+  background-repeat:no-repeat;mask-image:linear-gradient(90deg,transparent,#000 30%,#000 90%,transparent)}
+.hero .container{position:relative;z-index:2}
+.hero-grid{display:block;max-width:760px}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--flare-ink);margin-bottom:12px;opacity:0;transform:translateY(16px);animation:heroUp .8s ease .05s forwards}
+.hero h1{font-size:clamp(44px,7vw,84px);color:var(--pitch);opacity:0;transform:translateY(20px);animation:heroUp .8s cubic-bezier(.2,.9,.25,1) .12s forwards}
+.hero h1 em{font-style:normal;color:var(--flare-ink)}
+.hero-lead{font-size:19px;max-width:540px;margin:20px 0 26px;color:#2b3833;font-weight:500;opacity:0;transform:translateY(16px);animation:heroUp .8s ease .22s forwards}
+@keyframes heroUp{to{opacity:1;transform:none}}
+
+/* hero search — scoreboard-style card */
+.hero-search{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;background:var(--pitch);border-radius:16px;padding:18px;box-shadow:var(--shadow);max-width:620px;opacity:0;transform:translateY(16px);animation:heroUp .8s ease .32s forwards}
+.hero-search .hs-field{flex:1;min-width:150px}
+.hero-search label{display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--volt);margin:0 0 7px 2px}
+.hero-search select,.hero-search input{width:100%;margin:0;border:2px solid rgba(241,243,236,.18);background:#0a1f19;color:var(--chalk);border-radius:10px;padding:12px 13px;font-size:15px}
+.hero-search select:focus,.hero-search input:focus{border-color:var(--volt);outline:none}
+.hero-search input::placeholder{color:rgba(241,243,236,.55)}
+.hero-search .hs-go{background:var(--volt);color:var(--ink);font-weight:800;padding:13px 22px;border-radius:10px;flex:0 0 auto}
+.hero-search .hs-go:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px rgba(216,251,79,.7)}
+.hero-reassure{font-size:15px;font-weight:600;color:#1c6b3f;margin:16px 0 0;opacity:0;transform:translateY(12px);animation:heroUp .8s ease .42s forwards}
+
+/* hero stats — real numbers */
+.hero-stats{list-style:none;display:flex;gap:34px;flex-wrap:wrap;margin-top:26px;opacity:0;transform:translateY(12px);animation:heroUp .8s ease .5s forwards}
+.hero-stats .hs-num{font-family:'Anton',sans-serif;font-size:40px;color:var(--pitch);line-height:.9;display:block}
+.hero-stats .hs-num small{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#5c6a63;margin-left:4px}
+.hero-stats .hs-lbl{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5c6a63;margin-top:4px;display:block}
+
+/* ---------- MARQUEE ---------- */
+.marquee{background:var(--ink);color:var(--chalk);padding:13px 0;overflow:hidden;white-space:nowrap;border-top:3px solid var(--volt);border-bottom:3px solid var(--volt)}
+.marquee .track{display:inline-block;font-family:'Anton',sans-serif;font-size:19px;letter-spacing:.05em;text-transform:uppercase;animation:scroll 24s linear infinite}
+.marquee .track b{color:var(--volt);margin:0 16px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- SECTIONS ---------- */
+.section{padding:72px 0}
+.section-title{font-size:clamp(32px,4.4vw,52px);color:var(--pitch);margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+/* ---------- CARDS ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.court-card{position:relative;overflow:hidden;padding:22px 22px 18px;--sport:var(--pitch);--sport-ink:var(--pitch);transition:transform .3s cubic-bezier(.2,.9,.25,1),box-shadow .3s}
+.court-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--sport)}
+.court-card::after{content:"";position:absolute;right:-45px;top:-45px;width:130px;height:130px;border-radius:50%;background:var(--sport);filter:blur(46px);opacity:0;transition:opacity .35s}
+.court-card:hover{transform:translateY(-8px);box-shadow:0 30px 50px -28px rgba(10,15,13,.5)}
+.court-card:hover::after{opacity:.26}
+.court-card[data-sport="Football"]{--sport:var(--football);--sport-ink:var(--football-ink)}
+.court-card[data-sport="Padel"]{--sport:var(--padel);--sport-ink:var(--padel-ink)}
+.court-card[data-sport="Basketball"]{--sport:var(--basket);--sport-ink:var(--basket-ink)}
+.court-card[data-sport="Volleyball"]{--sport:var(--volley);--sport-ink:var(--volley-ink)}
+.court-card[data-sport="Tennis"]{--sport:var(--tennis);--sport-ink:var(--tennis-ink)}
+.sport-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--sport-ink,var(--pitch));padding:5px 11px;border-radius:7px;position:relative;z-index:2}
+.court-card h3{font-size:24px;color:var(--pitch);margin:14px 0 6px;position:relative;z-index:2}
+.loc{font-size:14px;color:#5c6a63;font-weight:500}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);position:relative;z-index:2}
+.price{font-family:'Space Mono',monospace;font-weight:700;font-size:24px;color:var(--pitch)}
+.price span{font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;color:#6b776f}
+.status-available{color:var(--football);font-weight:700}
+.status-maintenance,.status-unavailable{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#b8860b;text-transform:uppercase;letter-spacing:.04em}
+
+/* ---------- FORMS ---------- */
+.form-card{max-width:520px;margin:0 auto;padding:34px}
+.form-card h1{font-size:34px;color:var(--pitch);margin-bottom:6px}
+.form-card label,.filter-bar label{display:block;font-weight:600;font-size:14px;color:var(--pitch);margin:16px 0 6px}
+input,select{width:100%;font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);transition:border-color .18s}
+input:focus,select:focus{outline:none;border-color:var(--flare)}
+.form-actions{display:flex;gap:12px;align-items:center;margin-top:24px}
+.form-hint{font-size:14px;color:#5c6a63;margin-top:14px}
+.form-hint a{color:var(--flare-ink);font-weight:700}
+.filter-bar{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:30px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+.filter-bar select,.filter-bar input{width:auto;flex:1;min-width:160px;margin:0}
+.filter-bar .btn{margin:0}
+
+/* ---------- ALERTS ---------- */
+.alert{padding:13px 16px;border-radius:11px;font-weight:600;font-size:15px;margin:16px 0;border-left:5px solid}
+.alert-success{background:#eafbef;color:#12673a;border-color:var(--football)}
+.alert-error{background:#fdeee9;color:#b23a17;border-color:var(--flare)}
+
+/* ---------- TABLES (my bookings / admin) ---------- */
+.table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);font-size:15px}
+th{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pitch);background:var(--chalk)}
+tr:last-child td{border-bottom:none}
+.row-actions{display:flex;gap:8px}
+.inline-form{display:inline}
+
+/* ---------- STATS (admin dashboard) ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:34px}
+.stat{background:var(--pitch);color:var(--chalk);border-radius:14px;padding:22px}
+.stat .num{font-size:44px;color:var(--volt);display:block;line-height:1}
+.stat .lbl{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,243,236,.7);margin-top:6px;display:block}
+
+/* ---------- FOOTER ---------- */
+.site-footer{background:var(--pitch);color:rgba(241,243,236,.72);padding:40px 0;margin-top:60px}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-inner strong{color:var(--chalk);font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.02em}
+.footer-inner .muted{color:rgba(241,243,236,.5);font-family:'Space Mono',monospace;font-size:12px}
+
+/* ---------- SCROLL REVEAL ---------- */
+.js .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.9,.25,1)}
+/* Only hide these once we know scripting is on to bring them back. Keyed on
+   the .js class main.js sets, because with JavaScript off nothing ever adds
+   .in and the featured courts would stay invisible forever. */
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:900px){
+  .grid,.stats{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .nav-links{gap:16px}
+  .nav-links li:nth-child(1),.nav-links li:nth-child(2){display:none}
 }
-/* Cancel/Delete are <button>s inside their own little POST form now, so the
-   form must not add a line break or spacing that the old <a> did not. */
-.inline-form { display: inline; }
-.btn:hover { opacity: .9; }
-.btn-sm { padding: 6px 14px; font-size: .8rem; }
-.btn-primary { background: #1f9d55; color: #fff; }
-.btn-outline { background: transparent; color: #fff; border: 1px solid #fff; }
-.btn-dark    { background: #1f6b3e; color: #fff; }
-.btn-danger  { background: #c0392b; color: #fff; }
-
-/* ---------------------------------------------------------------
-   Hero. Same brand green and same flat, bordered card language as the
-   rest of the site; the change is what sits in it. The old hero used the
-   left half of the screen and left the right half empty, and asked the
-   visitor to read a sentence before they could do anything. Now the first
-   thing in reach is the search, with the promises next to it.
-   --------------------------------------------------------------- */
-.hero {
-  background: #1f6b3e;
-  color: #fff;
-  padding: 56px 0 60px;
-  /* A single soft highlight, in the greens already in the palette, so the
-     band reads as a surface rather than a flat rectangle. */
-  background-image: radial-gradient(760px 420px at 12% -10%, #237a46 0%, rgba(35,122,70,0) 62%);
-  border-bottom: 3px solid #145029;
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .hero h1,.hero p,.hero .btn,.reveal{opacity:1;transform:none}
 }
-.hero-inner {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 44px;
-  align-items: center;
-}
-
-.hero-eyebrow {
-  font-size: .78rem; font-weight: bold; text-transform: uppercase;
-  letter-spacing: .09em; color: #e4f5ec; margin-bottom: 12px;
-}
-.hero h1 { font-size: 2.5rem; line-height: 1.15; margin-bottom: 14px; }
-.hero h1 em { font-style: normal; color: #9fe3bb; }
-.hero-lead { color: #e4f5ec; max-width: 30rem; margin-bottom: 22px; }
-
-/* The search sits on a white card so it reads as the thing to use, the same
-   card treatment the filter bar on the courts page already uses. */
-.hero-search {
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
-  background: #fff; border-radius: 6px; padding: 14px;
-  box-shadow: 0 6px 20px rgba(10, 48, 27, .22);
-}
-.hero-field { flex: 1 1 150px; min-width: 0; }
-.hero-field label {
-  color: #4a5a50; font-size: .74rem; text-transform: uppercase;
-  letter-spacing: .05em; margin: 0 0 5px;
-}
-.hero-submit { flex: 0 0 auto; padding: 11px 22px; }
-
-.hero-reassure {
-  margin-top: 14px; font-size: .88rem; font-weight: 600; color: #e4f5ec;
-  display: flex; align-items: baseline; gap: 8px;
-}
-.hero-reassure span { color: #9fe3bb; font-weight: bold; }
-
-/* The three promises. Deliberately plain text on a darker green panel rather
-   than icons or badges, to stay in keeping with the rest of the site. */
-.hero-panel {
-  background: rgba(11, 61, 33, .55);
-  border: 1px solid #3d8a5f;
-  border-radius: 6px;
-  padding: 20px 22px;
-}
-.hero-points { list-style: none; }
-.hero-points li { padding: 13px 0; border-top: 1px solid rgba(255, 255, 255, .13); }
-.hero-points li:first-child { padding-top: 0; border-top: 0; }
-.hero-points li:last-child { padding-bottom: 0; }
-.hero-points strong {
-  display: block; font-size: .97rem; margin-bottom: 3px;
-  /* The tick is drawn in CSS so the markup stays plain HTML. */
-}
-.hero-points strong::before { content: "\2713"; color: #9fe3bb; margin-right: 8px; }
-.hero-points span { display: block; font-size: .86rem; color: #cfe0d5; line-height: 1.45; }
-.hero-panel-cta {
-  margin-top: 18px; padding-top: 15px; font-size: .85rem; color: #cfe0d5;
-  border-top: 1px solid rgba(255, 255, 255, .13);
-}
-.hero-panel-cta a { color: #fff; font-weight: bold; }
-
-.section-more { margin-top: 18px; font-size: .9rem; }
-.section-more a { color: #1f6b3e; font-weight: bold; }
-
-.section { padding: 40px 0; }
-/* Each page's main heading is an <h1> so screen readers and search engines can
-   tell what the page is about. These rules keep it looking the same size it
-   did when it was an <h2>. */
-.section-title { font-size: 1.3rem; margin-bottom: 18px; }
-.form-card h1 { font-size: 1.3rem; }
-.card h2 { font-size: 1.1rem; }
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-
-.card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 18px; }
-.court-card .sport-tag {
-  display: inline-block; font-size: .75rem; font-weight: bold; text-transform: uppercase;
-  background: #e4f5ec; color: #1f6b3e; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px;
-}
-.court-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
-.court-card .loc { font-size: .88rem; color: #666; margin-bottom: 10px; }
-.court-card .price { font-weight: bold; font-size: 1.1rem; }
-.court-card .price span { font-weight: normal; font-size: .8rem; color: #666; }
-.court-card .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
-.badge-maint { color: #8a5a00; font-weight: bold; font-size: .85rem; }
-
-.filter-bar {
-  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px;
-  background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px;
-}
-.filter-bar select, .filter-bar input { flex: 1; min-width: 150px; }
-
-.form-card { max-width: 450px; margin: 40px auto; }
-label { display: block; font-weight: bold; font-size: .85rem; margin: 12px 0 5px; }
-input, select {
-  width: 100%; padding: 9px 11px; border: 1px solid #ccc; border-radius: 4px;
-  font-family: inherit; font-size: .9rem; background: #fff;
-}
-input:focus, select:focus { outline: 2px solid #1f9d55; }
-/* Keyboard users need to see where they are, on links and buttons too. */
-a:focus-visible, button:focus-visible { outline: 2px solid #1f9d55; outline-offset: 2px; }
-.form-actions { margin-top: 18px; }
-.form-hint { font-size: .82rem; color: #666; margin-top: 12px; }
-
-.alert { padding: 11px 14px; border-radius: 4px; font-weight: 600; margin: 16px 0; font-size: .9rem; }
-.alert-success { background: #e4f5ec; color: #1f6b3e; border: 1px solid #bfe6d0; }
-.alert-error   { background: #fdecea; color: #c0392b; border: 1px solid #f5c6c0; }
-
-.table-wrap { overflow-x: auto; background: #fff; border: 1px solid #ddd; border-radius: 6px; }
-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
-th, td { padding: 10px 12px; text-align: left; }
-thead th { background: #1f6b3e; color: #fff; font-size: .78rem; text-transform: uppercase; }
-tbody tr { border-top: 1px solid #eee; }
-tbody tr:hover { background: #fafafa; }
-.status-confirmed { color: #157347; font-weight: bold; }
-.status-cancelled { color: #c0392b; font-weight: bold; }
-.row-actions { display: flex; gap: 6px; }
-
-.stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 26px; }
-.stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 16px; }
-.stat .num { font-size: 1.7rem; font-weight: bold; color: #1f6b3e; }
-.stat .lbl { font-size: .82rem; color: #666; }
-
-.site-footer { background: #145029; color: #ddd; margin-top: 50px; }
-.footer-inner { padding: 22px 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.site-footer strong { color: #fff; }
-
-/* The two hero columns stack before they get cramped: the promises panel needs
-   room to stay readable, so it drops under the search rather than squeezing. */
-@media (max-width: 900px) {
-  .hero-inner { grid-template-columns: 1fr; gap: 28px; }
-  .hero h1 { font-size: 2.2rem; }
-  .hero-lead { max-width: none; }
-}
-
-@media (max-width: 640px) {
-  .nav { flex-direction: column; height: auto; padding: 10px 0; gap: 8px; }
-  .nav-links { flex-wrap: wrap; justify-content: center; gap: 12px; }
-  .hero { padding: 36px 0 40px; }
-  .hero h1 { font-size: 1.95rem; }
-  /* Fields go full width and the button spans the row, so nothing ends up as a
-     narrow tap target on a phone. */
-  .hero-field { flex: 1 1 100%; }
-  .hero-submit { flex: 1 1 100%; }
-  .footer-inner { flex-direction: column; text-align: center; }
-}
-
-/* A keyboard user should be able to jump past the navigation instead of tabbing
-   through it on every page. Hidden until it is focused. */
-.skip-link {
-  position: absolute; left: -9999px;
-  background: #fff; color: #1f6b3e; font-weight: bold;
-  padding: 10px 16px; border-radius: 0 0 4px 0; z-index: 10;
-}
-.skip-link:focus { left: 0; top: 0; }
