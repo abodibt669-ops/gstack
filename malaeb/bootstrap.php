@@ -19,6 +19,8 @@ ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/config/payments.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/validation.php';
 require_once __DIR__ . '/includes/template.php';
+require_once __DIR__ . '/includes/payments.php';

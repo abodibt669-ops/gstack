@@ -56,6 +56,9 @@ if ($bookings->num_rows === 0) {
                 . '</div>';
         } elseif ($b['status'] === 'confirmed') {
             $actions = '<span class="muted">Past</span>';
+        } elseif ($b['status'] === 'pending' && !$isPast) {
+            $actions = '<a class="btn btn-primary btn-sm" href="pay.php?booking_id='
+                . (int)$b['booking_id'] . '">Pay now</a>';
         } else {
             $actions = '<span class="muted">-</span>';
         }

@@ -1,5 +1,5 @@
 /* ============================================================
-   MALAEB — sporty redesign
+   WAGTI — sporty redesign
    Court-line + scoreboard identity. One stylesheet, every page.
    ============================================================ */
 @font-face{font-family:'Anton';src:url('../fonts/Anton-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
@@ -180,3 +180,16 @@ tr:last-child td{border-bottom:none}
   *{animation:none!important;transition:none!important}
   .hero h1,.hero p,.hero .btn,.reveal{opacity:1;transform:none}
 }
+
+/* ---------- CHECKOUT (pay.html) ---------- */
+.pay-card{max-width:480px}
+.pay-amount{display:flex;align-items:baseline;justify-content:space-between;background:var(--chalk);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:18px 0}
+.pay-amount-lbl{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5c6a63}
+.pay-amount-val{font-family:'Anton',sans-serif;font-size:34px;color:var(--pitch);line-height:1}
+.pay-amount-val small{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#6b776f;margin-left:2px}
+
+/* ---------- BOOKING STATUS PILLS ---------- */
+.status-confirmed,.status-pending,.status-cancelled{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px;display:inline-block}
+.status-confirmed{background:#e6f7ee;color:#12673a}
+.status-pending{background:#fff3d6;color:#7a5600}
+.status-cancelled{background:#f0f1ee;color:#5f6a63}

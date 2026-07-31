@@ -1,4 +1,7 @@
--- Malaeb database - SWE 322 project
+-- Wagti database
+-- The schema keeps the malaeb_db name and the MALAEB_* environment variables:
+-- those are internal identifiers, and renaming them would mean every existing
+-- install had to re-import and reconfigure for a change nobody can see.
 CREATE DATABASE IF NOT EXISTS malaeb_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE malaeb_db;
 
@@ -17,7 +20,7 @@ CREATE TABLE users (
 );
 
 INSERT INTO users (full_name, email, password, phone, role) VALUES
-('System Admin',      'admin@malaeb.com',  '$2y$12$UFJ6qMhtEZeDBq.jIzIgjuVxmJkpukIilMHLplI.0IDcjLxoLv0nm', '0500000000', 'admin'),
+('System Admin',      'admin@wagti.com',  '$2y$12$UFJ6qMhtEZeDBq.jIzIgjuVxmJkpukIilMHLplI.0IDcjLxoLv0nm', '0500000000', 'admin'),
 ('Saud Alqahtani',    'saud@example.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0551112222', 'customer'),
 ('Mohammed Alharbi',  'mohd@example.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0553334444', 'customer'),
 ('Fahad Alotaibi',    'fahad@example.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0555556666', 'customer'),
@@ -53,7 +56,8 @@ CREATE TABLE bookings (
     start_time   TIME NOT NULL,
     end_time     TIME NOT NULL,
     total_price  DECIMAL(8,2) NOT NULL,
-    status       ENUM('confirmed','cancelled') NOT NULL DEFAULT 'confirmed',
+    status       ENUM('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
+    payment_ref  VARCHAR(64) NULL,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id)  REFERENCES users(user_id)  ON DELETE CASCADE,
     FOREIGN KEY (court_id) REFERENCES courts(court_id) ON DELETE CASCADE,

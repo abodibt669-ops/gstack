@@ -1,5 +1,5 @@
-# Malaeb - Online Sports Court Booking Platform
-SWE 322 - Advanced Web Programming Project
+# Wagti - Online Sports Court Booking Platform
+A Saudi sports court booking platform.
 
 ## How to run (XAMPP)
 1. Start Apache and MySQL in the XAMPP Control Panel.
@@ -13,7 +13,7 @@ with fresh sample data, so you can always get back to a clean demo.
 ## Test accounts
 | Role     | Email             | Password |
 |----------|-------------------|----------|
-| Admin    | admin@malaeb.com  | admin123 |
+| Admin    | admin@wagti.com  | admin123 |
 | Customer | saud@example.com  | pass1234 |
 
 ## Running the tests

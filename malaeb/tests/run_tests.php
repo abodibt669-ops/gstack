@@ -194,7 +194,7 @@ echo "\nStored demo passwords\n";
 // The README hands these out; if the seeded hashes and the documented passwords
 // ever drift apart, nobody can log in to the demo.
 $sql = file_get_contents(__DIR__ . '/../database.sql');
-preg_match("/'admin\@malaeb\.com',\s*'([^']+)'/", $sql, $m);
+preg_match("/'admin\@wagti\.com',\s*'([^']+)'/", $sql, $m);
 check_true('the README admin password matches the seeded hash',
     password_verify('admin123', $m[1] ?? ''));
 preg_match("/'saud\@example\.com',\s*'([^']+)'/", $sql, $m);

@@ -87,7 +87,7 @@ function render_page(string $title, Html $content, string $base = ''): void {
         header('Content-Type: text/html; charset=UTF-8');
     }
     echo view('layout.html', [
-        'title'    => $title . ' | Malaeb',
+        'title'    => $title . ' | Wagti',
         'base'     => $base,
         'nav_auth' => raw($navAuth),
         'content'  => $content,

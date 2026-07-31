@@ -35,10 +35,18 @@ if (isPost() && $court) {
         // conflicting row would go), makes the second one wait and then lose.
         $conn->begin_transaction();
         try {
+            // A slot is taken if there's a confirmed booking, OR a still-fresh
+            // pending one someone is paying for right now. Pending holds older
+            // than PENDING_HOLD_MINUTES are ignored, so an abandoned checkout
+            // never locks a slot forever. NOW() and created_at are both DB
+            // server time, so this stays correct whatever PHP's timezone is.
             $chk = $conn->prepare(
                 "SELECT COUNT(*) AS n FROM bookings
-                 WHERE court_id = ? AND booking_date = ? AND status = 'confirmed'
+                 WHERE court_id = ? AND booking_date = ?
                    AND start_time < ? AND end_time > ?
+                   AND (status = 'confirmed'
+                        OR (status = 'pending'
+                            AND created_at > NOW() - INTERVAL " . PENDING_HOLD_MINUTES . " MINUTE))
                  FOR UPDATE"
             );
             $chk->bind_param("isss", $courtId, $date, $end, $start);
@@ -49,18 +57,20 @@ if (isPost() && $court) {
                 $error = "This time slot is already booked. Please choose another time.";
             } else {
                 $total = round(slot_hours($start, $end) * (float)$court['price_per_hour'], 2);
+                // Saved as 'pending' (unpaid). It only becomes 'confirmed' after
+                // the payment is verified in payment_callback.php.
                 $ins = $conn->prepare(
-                    "INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time, total_price)
-                     VALUES (?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time, total_price, status)
+                     VALUES (?, ?, ?, ?, ?, ?, 'pending')"
                 );
                 $ins->bind_param("iisssd", $_SESSION['user_id'], $courtId, $date, $start, $end, $total);
                 $ins->execute();
+                $bookingId = $conn->insert_id;
                 $conn->commit();
 
-                flash('success', "Booking confirmed! Total: " . number_format($total, 2) . " SAR. See it in My Bookings.");
-                // Redirect after a successful POST so a refresh reloads the page
-                // instead of trying to book the same slot again.
-                redirect('booking.php?court_id=' . $courtId);
+                // Hand off to payment. Refreshing the booking page can't now
+                // double-book, because the slot is already held as pending.
+                redirect('pay.php?booking_id=' . $bookingId);
             }
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
