@@ -19,7 +19,7 @@ $bookingId = (int)($_GET['booking_id'] ?? $_POST['booking_id'] ?? 0);
 
 // Load the booking — must belong to the logged-in user.
 $stmt = $conn->prepare(
-    "SELECT booking_id, court_id, booking_date, start_time, end_time, total_price, status, payment_ref
+    "SELECT booking_id, court_id, booking_date, start_time, end_time, total_price, status, invoice_ref
      FROM bookings WHERE booking_id = ? AND user_id = ?"
 );
 $stmt->bind_param("ii", $bookingId, $_SESSION['user_id']);
@@ -56,7 +56,7 @@ $expected = payment_amount_halalas($b['total_price']);
 
 // The invoice we created for this booking, recorded by pay.php. The payment
 // coming back has to belong to it, or it is not paying for this booking.
-$expectedInvoice = (string)($b['payment_ref'] ?? '');
+$expectedInvoice = (string)($b['invoice_ref'] ?? '');
 $result = moyasar_verify_payment($paymentId, $expected, $expectedInvoice);
 
 if (!$result['paid']) {
@@ -112,7 +112,10 @@ try {
     }
 
     $up = $conn->prepare(
-        "UPDATE bookings SET status = 'confirmed', payment_ref = ?
+        // Records the payment alongside the invoice rather than on top of it,
+        // so afterwards it is still possible to see which invoice this payment
+        // answered.
+        "UPDATE bookings SET status = 'confirmed', payment_id = ?
          WHERE booking_id = ? AND user_id = ? AND status = 'pending'"
     );
     $up->bind_param("sii", $result['id'], $bookingId, $_SESSION['user_id']);

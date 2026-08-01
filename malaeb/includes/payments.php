@@ -147,7 +147,7 @@ function moyasar_payment_is_acceptable(array $payment, int $expectedHalalas, str
 }
 
 // Read a payment back and decide if it truly paid for this booking.
-// $expectedInvoiceId is the booking's stored payment_ref, written by pay.php
+// $expectedInvoiceId is the booking's stored invoice_ref, written by pay.php
 // when the invoice was created.
 // Returns ['paid'=>bool, 'id'=>string, 'reason'=>string].
 function moyasar_verify_payment(string $paymentId, int $expectedHalalas, string $expectedInvoiceId = ''): array

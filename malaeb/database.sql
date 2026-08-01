@@ -57,7 +57,20 @@ CREATE TABLE bookings (
     end_time     TIME NOT NULL,
     total_price  DECIMAL(8,2) NOT NULL,
     status       ENUM('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
-    payment_ref  VARCHAR(64) NULL,
+
+    -- Two separate references, because they are two different things and the
+    -- payment check needs both to still be readable afterwards:
+    --   invoice_ref  the invoice we asked the gateway to create for this
+    --                booking, written when the customer is sent off to pay.
+    --                The callback compares the returned payment against this
+    --                to prove the payment belongs to THIS booking.
+    --   payment_id   the payment that actually settled it, written only once
+    --                the payment has been verified.
+    -- Keeping one column for both would mean confirming a booking overwrote
+    -- the very value the check was made against, leaving no way to audit
+    -- afterwards which invoice a payment answered.
+    invoice_ref  VARCHAR(64) NULL,
+    payment_id   VARCHAR(64) NULL,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id)  REFERENCES users(user_id)  ON DELETE CASCADE,
     FOREIGN KEY (court_id) REFERENCES courts(court_id) ON DELETE CASCADE,

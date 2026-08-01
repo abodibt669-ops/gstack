@@ -60,8 +60,10 @@ if (!$invoice['ok']) {
     redirect('my_bookings.php');
 }
 
-// Record which invoice/payment belongs to this booking.
-$up = $conn->prepare("UPDATE bookings SET payment_ref = ? WHERE booking_id = ? AND user_id = ?");
+// Record which invoice belongs to this booking. The callback checks the
+// payment that comes back against this, so it has to be stored before the
+// customer leaves for the payment page.
+$up = $conn->prepare("UPDATE bookings SET invoice_ref = ? WHERE booking_id = ? AND user_id = ?");
 $up->bind_param("sii", $invoice['id'], $b['booking_id'], $_SESSION['user_id']);
 $up->execute();
 
