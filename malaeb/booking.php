@@ -7,8 +7,10 @@ $error = '';
 
 $courtId = (int)($_GET['court_id'] ?? $_POST['court_id'] ?? 0);
 $stmt = $conn->prepare(
+    // Unlisted courts are refused here too. Filtering only the listings
+    // would leave the court bookable to anyone who kept the link.
     "SELECT court_id, name, sport_type, location, price_per_hour
-     FROM courts WHERE court_id = ? AND status = 'available'"
+     FROM courts WHERE court_id = ? AND status = 'available' AND is_published = 1"
 );
 $stmt->bind_param("i", $courtId);
 $stmt->execute();

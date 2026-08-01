@@ -26,7 +26,7 @@ $stmt->execute();
 $s = $stmt->get_result()->fetch_assoc();
 
 // --- their courts -----------------------------------------------------
-$sql = "SELECT court_id, name, sport_type, location, price_per_hour, status
+$sql = "SELECT court_id, name, sport_type, location, price_per_hour, status, is_published
         FROM courts" . ($isAdmin ? '' : ' WHERE owner_id = ?') . " ORDER BY name";
 $stmt = $conn->prepare($sql);
 if (!$isAdmin) { $stmt->bind_param("i", $ownerId); }
@@ -35,6 +35,13 @@ $courts = $stmt->get_result();
 
 $rows = '';
 while ($c = $courts->fetch_assoc()) {
+    // An unlisted court still belongs to the owner and is still editable here;
+    // it has just been taken off the public listing, so say so plainly rather
+    // than leaving them wondering why nobody is booking it.
+    $hiddenNote = (int)$c['is_published'] === 1
+        ? ''
+        : '<span class="badge-hidden">Not visible to players</span>';
+
     $rows .= view('owner/court_row.html', [
         'name'     => $c['name'],
         'sport'    => $c['sport_type'],
@@ -43,6 +50,7 @@ while ($c = $courts->fetch_assoc()) {
         'status'   => COURT_STATUSES[$c['status']] ?? $c['status'],
         'status_class' => $c['status'],
         'court_id' => (int)$c['court_id'],
+        'hidden_note'  => raw($hiddenNote),
     ])->html;
 }
 if ($rows === '') {

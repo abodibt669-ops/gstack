@@ -4,7 +4,8 @@ require_once __DIR__ . '/bootstrap.php';
 
 $featured = $conn->query(
     "SELECT court_id, name, sport_type, location, price_per_hour
-     FROM courts WHERE status = 'available' ORDER BY price_per_hour ASC LIMIT 3"
+     FROM courts WHERE status = 'available' AND is_published = 1
+     ORDER BY price_per_hour ASC LIMIT 3"
 );
 
 // build the featured cards by filling the court_card.html partial once per court
@@ -30,13 +31,15 @@ foreach (SPORTS as $s) {
 }
 
 // Real numbers, counted from the catalogue on every load — never hard-coded.
-// Sports and districts describe the whole catalogue; the starting price is a
-// promise about what can actually be booked now, so it counts available only.
+// Sports and districts describe what a visitor can actually browse, so unlisted
+// courts are left out; the starting price is a promise about what can be booked
+// right now, so it counts published AND available only.
 $stats = $conn->query(
     "SELECT
-        (SELECT COUNT(DISTINCT sport_type) FROM courts)                                    AS sports,
-        (SELECT COUNT(DISTINCT location)   FROM courts)                                    AS districts,
-        (SELECT MIN(price_per_hour) FROM courts WHERE status = 'available')                AS from_price"
+        (SELECT COUNT(DISTINCT sport_type) FROM courts WHERE is_published = 1)             AS sports,
+        (SELECT COUNT(DISTINCT location)   FROM courts WHERE is_published = 1)             AS districts,
+        (SELECT MIN(price_per_hour) FROM courts
+          WHERE status = 'available' AND is_published = 1)                                 AS from_price"
 )->fetch_assoc();
 
 $content = view('index.html', [

@@ -197,3 +197,7 @@ tr:last-child td{border-bottom:none}
 /* ---------- OWNER DASHBOARD ---------- */
 .owner-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
 .owner-head .section-title{margin:0}
+
+/* A court its owner has taken off the public listing. Same shape as the other
+   row badges; colour checked against the row background for contrast. */
+.badge-hidden{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px;background:#f0f1ee;color:#5f6a63;margin-left:8px}

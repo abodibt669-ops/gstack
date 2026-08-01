@@ -12,7 +12,11 @@ if ($sport !== '' && !valid_choice($sport, SPORTS)) {
 }
 
 // build the filtered query
-$sql = "SELECT court_id, name, sport_type, location, price_per_hour, status FROM courts WHERE 1=1";
+// is_published = 0 means the owner or an admin has taken the court off the
+// public listing. It stays in the database with its bookings intact; it just
+// stops being offered to players, here and in the search below.
+$sql = "SELECT court_id, name, sport_type, location, price_per_hour, status
+        FROM courts WHERE is_published = 1";
 $types = ""; $params = [];
 if ($sport !== '') {
     $sql .= " AND sport_type = ?"; $types .= "s"; $params[] = $sport;
