@@ -193,3 +193,7 @@ tr:last-child td{border-bottom:none}
 .status-confirmed{background:#e6f7ee;color:#12673a}
 .status-pending{background:#fff3d6;color:#7a5600}
 .status-cancelled{background:#f0f1ee;color:#5f6a63}
+
+/* ---------- OWNER DASHBOARD ---------- */
+.owner-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.owner-head .section-title{margin:0}

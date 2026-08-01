@@ -15,7 +15,7 @@ CREATE TABLE users (
     email      VARCHAR(120) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     phone      VARCHAR(20),
-    role       ENUM('admin','customer') NOT NULL DEFAULT 'customer',
+    role       ENUM('admin','owner','customer') NOT NULL DEFAULT 'customer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -25,7 +25,9 @@ INSERT INTO users (full_name, email, password, phone, role) VALUES
 ('Mohammed Alharbi',  'mohd@example.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0553334444', 'customer'),
 ('Fahad Alotaibi',    'fahad@example.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0555556666', 'customer'),
 ('Nawaf Aldossari',   'nawaf@example.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0557778888', 'customer'),
-('Yousef Alshehri',   'yousef@example.com','$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0559990000', 'customer');
+('Yousef Alshehri',   'yousef@example.com','$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0559990000', 'customer'),
+('Khalid Al Nakheel', 'khalid@courts.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0561234567', 'owner'),
+('Rakan Padel Group', 'rakan@courts.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0567654321', 'owner');
 
 CREATE TABLE courts (
     court_id       INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,19 +36,29 @@ CREATE TABLE courts (
     location       VARCHAR(150) NOT NULL,
     price_per_hour DECIMAL(8,2) NOT NULL,
     status         ENUM('available','maintenance') NOT NULL DEFAULT 'available',
+    -- Which owner lists this court. NULL means unclaimed (an admin-created
+    -- court, or one whose owner account was removed).
+    owner_id       INT NULL,
+    is_published   TINYINT(1) NOT NULL DEFAULT 1,
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     INDEX idx_sport_price (sport_type, price_per_hour),
+    INDEX idx_owner (owner_id),
+    -- ON DELETE SET NULL on purpose. CASCADE here would mean removing an owner
+    -- account silently deleted their courts, and the bookings hanging off those
+    -- courts with them. The court survives, unclaimed, for an admin to reassign.
+    CONSTRAINT fk_court_owner FOREIGN KEY (owner_id) REFERENCES users(user_id) ON DELETE SET NULL,
     CONSTRAINT chk_court_price CHECK (price_per_hour > 0)
 );
 
-INSERT INTO courts (name, sport_type, location, price_per_hour, status) VALUES
-('Al Nakheel Football Field',  'Football',   'Al Nakheel District, Riyadh',  180.00, 'available'),
-('Padel Pro Court 1',          'Padel',      'Al Olaya District, Riyadh',    120.00, 'available'),
-('Padel Pro Court 2',          'Padel',      'Al Olaya District, Riyadh',    120.00, 'available'),
-('Slam Basketball Court',      'Basketball', 'Al Malqa District, Riyadh',     90.00, 'available'),
-('Beach Volleyball Arena',     'Volleyball', 'Al Yasmin District, Riyadh',    75.00, 'available'),
-('Center Court Tennis',        'Tennis',     'Diplomatic Quarter, Riyadh',   100.00, 'maintenance');
+-- owner_id 7 = Khalid Al Nakheel, 8 = Rakan Padel Group (the two seed owners).
+INSERT INTO courts (name, sport_type, location, price_per_hour, status, owner_id) VALUES
+('Al Nakheel Football Field',  'Football',   'Al Nakheel District, Riyadh',  180.00, 'available', 7),
+('Padel Pro Court 1',          'Padel',      'Al Olaya District, Riyadh',    120.00, 'available', 8),
+('Padel Pro Court 2',          'Padel',      'Al Olaya District, Riyadh',    120.00, 'available', 8),
+('Slam Basketball Court',      'Basketball', 'Al Malqa District, Riyadh',     90.00, 'available', 7),
+('Beach Volleyball Arena',     'Volleyball', 'Al Yasmin District, Riyadh',    75.00, 'available', 8),
+('Center Court Tennis',        'Tennis',     'Diplomatic Quarter, Riyadh',   100.00, 'maintenance', 7);
 
 CREATE TABLE bookings (
     booking_id   INT AUTO_INCREMENT PRIMARY KEY,

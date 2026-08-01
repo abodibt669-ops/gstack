@@ -73,6 +73,9 @@ function render_page(string $title, Html $content, string $base = ''): void {
     // the only part of the nav that changes: it depends on who is logged in
     if (isLoggedIn()) {
         $navAuth  = '<li><a href="' . e($base) . 'my_bookings.php">My Bookings</a></li>';
+        if (isOwner()) {
+            $navAuth .= '<li><a href="' . e($base) . 'owner/dashboard.php">My Courts</a></li>';
+        }
         if (isAdmin()) {
             $navAuth .= '<li><a href="' . e($base) . 'admin/dashboard.php">Admin</a></li>';
         }

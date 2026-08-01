@@ -25,6 +25,14 @@ function isAdmin(): bool {
     return isLoggedIn() && ($_SESSION['role'] ?? '') === 'admin';
 }
 
+// Court owners get their own dashboard. Admin counts as an owner for access
+// purposes so support staff can open an owner page, but ownership of a court
+// is always checked against owner_id separately — being admin never silently
+// makes you the owner of someone's court.
+function isOwner(): bool {
+    return isLoggedIn() && in_array($_SESSION['role'] ?? '', ['owner', 'admin'], true);
+}
+
 // Start a freshly-identified session for a user who just proved who they are.
 // The new session id matters: without it, an attacker who plants a known
 // session id in the victim's browser still holds a valid one after they log in.
@@ -64,6 +72,30 @@ function requireAdmin(string $base = ''): void {
     if (!isAdmin()) {
         redirect($base . 'index.php');
     }
+}
+
+function requireOwner(string $base = ''): void {
+    if (!isOwner()) {
+        redirect($base . 'index.php');
+    }
+}
+
+// Load a court only if this user is allowed to manage it. Returns null when the
+// court doesn't exist OR belongs to someone else — deliberately the same answer,
+// so nobody can probe which court ids exist by watching the error change.
+function ownedCourt(mysqli $conn, int $courtId): ?array {
+    $sql    = "SELECT * FROM courts WHERE court_id = ?";
+    $params = [$courtId];
+    $types  = "i";
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        $sql     .= " AND owner_id = ?";
+        $params[] = (int)$_SESSION['user_id'];
+        $types   .= "i";
+    }
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc() ?: null;
 }
 
 // One place that sends a redirect, so we never forget the exit() that stops the
