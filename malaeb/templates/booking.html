@@ -1,0 +1,30 @@
+<section class="section container">
+  <div class="card form-card">
+    <span class="sport-tag">{{sport}}</span>
+    <h1>{{name}}</h1>
+    <p class="muted">{{location}} - {{price}} SAR/hr</p>
+
+    {{alerts}}
+
+    <form id="bookingForm" method="POST" action="booking.php" data-rate="{{rate}}">
+      {{csrf}}
+      <input type="hidden" name="court_id" value="{{court_id}}">
+
+      <label for="booking_date">Date</label>
+      <input type="date" id="booking_date" name="booking_date" max="{{max_date}}" required>
+
+      <label for="start_time">Start time</label>
+      <input type="time" id="start_time" name="start_time" step="1800" required>
+
+      <label for="end_time">End time</label>
+      <input type="time" id="end_time" name="end_time" step="1800" required>
+
+      <p class="form-hint">Estimated total: <strong id="livePrice" aria-live="polite">--</strong></p>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Confirm booking</button>
+        <a class="btn btn-dark btn-sm" href="courts.php">Back</a>
+      </div>
+    </form>
+  </div>
+</section>

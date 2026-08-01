@@ -1,0 +1,23 @@
+<section class="section container">
+  <div class="card form-card pay-card">
+    <span class="sport-tag" style="background:var(--pitch)">Test checkout</span>
+    <h1>Confirm &amp; pay</h1>
+    <p class="muted">{{desc}}</p>
+
+    <div class="pay-amount">
+      <span class="pay-amount-lbl">Amount due</span>
+      <span class="pay-amount-val">{{amount}} <small>SAR</small></span>
+    </div>
+
+    <p class="form-hint">This is a simulated checkout — no real card is charged. In live mode this step is replaced by the secure Moyasar payment page (mada / Visa / Apple Pay).</p>
+
+    <form method="POST" action="payment_callback.php?booking_id={{booking_id}}">
+      {{csrf}}
+      <input type="hidden" name="booking_id" value="{{booking_id}}">
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" name="outcome" value="paid">Pay {{amount}} SAR</button>
+        <button class="btn btn-dark btn-sm" type="submit" name="outcome" value="failed">Simulate a failed payment</button>
+      </div>
+    </form>
+  </div>
+</section>
