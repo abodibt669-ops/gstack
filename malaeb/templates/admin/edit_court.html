@@ -1,0 +1,34 @@
+<section class="section container">
+  <div class="card form-card">
+    <h1>Edit court #{{id}}</h1>
+    {{alerts}}
+    <form method="POST" action="edit_court.php">
+      {{csrf}}
+      <input type="hidden" name="court_id" value="{{id}}">
+
+      <label for="name">Court name</label>
+      <input type="text" id="name" name="name" value="{{name}}" maxlength="100" required>
+
+      <label for="sport_type">Sport</label>
+      <select id="sport_type" name="sport_type" required>
+        {{sport_options}}
+      </select>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" value="{{location}}" maxlength="150" required>
+
+      <label for="price_per_hour">Price per hour (SAR)</label>
+      <input type="number" id="price_per_hour" name="price_per_hour" min="1" step="0.5" value="{{price}}" required>
+
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        {{status_options}}
+      </select>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save changes</button>
+        <a class="btn btn-dark btn-sm" href="dashboard.php">Back</a>
+      </div>
+    </form>
+  </div>
+</section>

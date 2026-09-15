@@ -1,0 +1,16 @@
+<section class="section container">
+  <h1 class="section-title">All bookings</h1>
+  {{alerts}}
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Customer</th><th>Court</th><th>Date</th><th>Time</th><th>Total</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {{rows}}
+      </tbody>
+    </table>
+  </div>
+  <p class="form-hint"><a href="dashboard.php">Back to dashboard</a></p>
+</section>
