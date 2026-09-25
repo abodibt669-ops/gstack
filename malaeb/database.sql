@@ -5,6 +5,7 @@
 CREATE DATABASE IF NOT EXISTS malaeb_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE malaeb_db;
 
+DROP TABLE IF EXISTS login_attempts;
 DROP TABLE IF EXISTS bookings;
 DROP TABLE IF EXISTS courts;
 DROP TABLE IF EXISTS users;
@@ -112,3 +113,14 @@ INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time, tot
 (2, 3, CURDATE() + INTERVAL 6 DAY,  '20:00:00', '22:00:00', 240.00, 'confirmed'),
 (2, 1, CURDATE() - INTERVAL 7 DAY,  '18:00:00', '19:00:00', 180.00, 'confirmed'),
 (2, 2, CURDATE() + INTERVAL 2 DAY,  '18:00:00', '19:00:00', 120.00, 'cancelled');
+
+-- Failed logins, used to slow down password guessing (see includes/throttle.php).
+-- Rows older than a day are purged automatically.
+CREATE TABLE login_attempts (
+    attempt_id   INT AUTO_INCREMENT PRIMARY KEY,
+    email        VARCHAR(120) NOT NULL,
+    ip           VARCHAR(45)  NOT NULL,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email_time (email, attempted_at),
+    INDEX idx_ip_time (ip, attempted_at)
+);
