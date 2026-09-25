@@ -175,6 +175,65 @@ check('a non-http scheme is ignored',
     'http://localhost/wagti',
     base_url_with('javascript:alert(1)'));
 
+// ---------------------------------------------------------------
+echo "\nProduction never falls back to the simulated checkout\n";
+// ---------------------------------------------------------------
+
+// Like the callback-address checks, each case gets its own php process so it
+// can have its own environment. It reports PAYMENTS_AVAILABLE, what a forged
+// "paid" from the test checkout verifies as, and whether invoice creation is
+// refused, plus anything written to the error log (stderr in the CLI).
+function payments_with(array $env): array {
+    $code = 'define("MALAEB",1);'
+          . '$_SERVER["HTTP_HOST"]="localhost"; $_SERVER["SCRIPT_NAME"]="/wagti/pay.php";'
+          . 'require "' . dirname(__DIR__) . '/config/payments.php";'
+          . 'require "' . dirname(__DIR__) . '/includes/payments.php";'
+          . '$r = ["available" => PAYMENTS_AVAILABLE];'
+          // Only safe to call when it cannot reach the network: disabled, or simulate.
+          . 'if (!PAYMENTS_AVAILABLE || PAYMENTS_MODE !== "live") {'
+          . '  $r["forged_paid"] = moyasar_verify_payment("sim_paid_7", 18000, "sim_7")["paid"];'
+          . '  $r["invoice_ok"]  = moyasar_create_invoice(18000, "test", "http://x/cb", 7)["ok"];'
+          . '}'
+          . 'echo "\nJSON:" . json_encode($r);';
+    $prefix = '';
+    foreach ($env as $k => $v) {
+        $prefix .= $k . '=' . escapeshellarg($v) . ' ';
+    }
+    // env -u clears anything inherited, so the machine running the tests
+    // cannot leak its own MALAEB_ENV or keys into a case.
+    $cmd = 'env -u MALAEB_ENV -u WAGTI_PAYMENTS_MODE -u MOYASAR_SECRET_KEY -u MOYASAR_PUBLISHABLE_KEY '
+         . $prefix . 'php -r ' . escapeshellarg($code) . ' 2>&1';
+    $out = (string) shell_exec($cmd);
+    $json = substr($out, (int) strrpos($out, 'JSON:') + 5);
+    $r = json_decode($json, true) ?: [];
+    $r['logged_disabled'] = str_contains($out, 'payments are DISABLED');
+    return $r;
+}
+
+$local = payments_with([]);
+check('on your own machine (no MALAEB_ENV) payments stay available', true, $local['available'] ?? null);
+check('...and the simulated checkout still confirms, as before',      true, $local['forged_paid'] ?? null);
+
+$prodSim = payments_with(['MALAEB_ENV' => 'production']);
+check('production with no payments mode set: payments are switched off', false, $prodSim['available'] ?? null);
+check('...a forged "paid" from the test checkout does NOT confirm',       false, $prodSim['forged_paid'] ?? null);
+check('...no invoice can be started either',                             false, $prodSim['invoice_ok'] ?? null);
+check('...and the server log says why',                                   true,  $prodSim['logged_disabled']);
+
+$prodPlaceholder = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live']);
+check('production in live mode with placeholder keys: still switched off', false, $prodPlaceholder['available'] ?? null);
+check('...and a forged "paid" still does not confirm',                    false, $prodPlaceholder['forged_paid'] ?? null);
+
+$prodHalfKeys = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live',
+                               'MOYASAR_SECRET_KEY' => 'sk_live_realvalue123']);
+check('production with only one real key: still switched off', false, $prodHalfKeys['available'] ?? null);
+
+$prodReady = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live',
+                            'MOYASAR_SECRET_KEY' => 'sk_live_realvalue123',
+                            'MOYASAR_PUBLISHABLE_KEY' => 'pk_live_realvalue123']);
+check('production in live mode with both real keys: payments are on', true,  $prodReady['available'] ?? null);
+check('...and nothing is logged as disabled',                          false, $prodReady['logged_disabled']);
+
 echo "\n" . str_repeat('-', 46) . "\n";
 echo "{$passed} passed, {$failed} failed\n";
 exit($failed === 0 ? 0 : 1);

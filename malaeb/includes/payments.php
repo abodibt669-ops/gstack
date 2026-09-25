@@ -87,6 +87,11 @@ function moyasar_request(string $method, string $path, array $data = []): array
 // local test-checkout page, so the flow is identical minus the real charge.
 function moyasar_create_invoice(int $amountHalalas, string $description, string $callbackUrl, int $bookingId): array
 {
+    // Fail closed when payments are switched off (see config/payments.php).
+    if (!PAYMENTS_AVAILABLE) {
+        return ['ok' => false];
+    }
+
     if (PAYMENTS_MODE !== 'live') {
         return [
             'ok'  => true,
@@ -152,6 +157,12 @@ function moyasar_payment_is_acceptable(array $payment, int $expectedHalalas, str
 // Returns ['paid'=>bool, 'id'=>string, 'reason'=>string].
 function moyasar_verify_payment(string $paymentId, int $expectedHalalas, string $expectedInvoiceId = ''): array
 {
+    // Fail closed: with payments switched off nothing can ever count as paid,
+    // so a booking cannot be confirmed through the simulated checkout.
+    if (!PAYMENTS_AVAILABLE) {
+        return ['paid' => false, 'id' => $paymentId, 'reason' => 'payments_disabled'];
+    }
+
     if (PAYMENTS_MODE !== 'live') {
         // In simulate mode the "payment id" carries the outcome the test
         // checkout chose, e.g. sim_paid_37 or sim_failed_37.

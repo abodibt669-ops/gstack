@@ -32,6 +32,13 @@ if ($b['status'] !== 'pending') {
     redirect('my_bookings.php');
 }
 
+// Payments switched off on this server (see config/payments.php): say so
+// plainly instead of showing a checkout that could never succeed.
+if (!PAYMENTS_AVAILABLE) {
+    flash('error', 'Online payment is temporarily unavailable. Please try again later.');
+    redirect('my_bookings.php');
+}
+
 $amountHalalas = payment_amount_halalas($b['total_price']);
 $amountLabel   = number_format((float)$b['total_price'], 2);
 $description   = $b['sport_type'] . ' — ' . $b['court_name']
