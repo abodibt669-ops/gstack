@@ -1,22 +1,16 @@
 -- ============================================================
---  DEMO DATABASE — for your own machine (XAMPP) only.
---  It DROPS all tables and creates demo accounts with public passwords
---  (admin123 / pass1234). NEVER import this on the real server:
---  use schema.sql there instead (see SERVER_SETUP.md).
+--  schema.sql — Wagti tables for the REAL server. No demo data.
+--  Safe to re-run: it only creates tables that don't exist yet and never
+--  drops or overwrites anything.
+--  After importing, create your admin from the command line:
+--      php tools/create_user.php admin "Your Name" you@example.com 05XXXXXXXX
 -- ============================================================
--- Wagti database
--- The schema keeps the malaeb_db name and the MALAEB_* environment variables:
--- those are internal identifiers, and renaming them would mean every existing
--- install had to re-import and reconfigure for a change nobody can see.
-CREATE DATABASE IF NOT EXISTS malaeb_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE malaeb_db;
+-- No CREATE DATABASE or USE line on purpose: create the database first (or use
+-- the one your host gave you), select it, and import this file into it. A
+-- dedicated database user usually may not create databases, and a hard-coded
+-- name would put the tables somewhere the site is not looking.
 
-DROP TABLE IF EXISTS login_attempts;
-DROP TABLE IF EXISTS bookings;
-DROP TABLE IF EXISTS courts;
-DROP TABLE IF EXISTS users;
-
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id    INT AUTO_INCREMENT PRIMARY KEY,
     full_name  VARCHAR(100) NOT NULL,
     email      VARCHAR(120) NOT NULL UNIQUE,
@@ -26,17 +20,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (full_name, email, password, phone, role) VALUES
-('System Admin',      'admin@wagti.com',  '$2y$12$UFJ6qMhtEZeDBq.jIzIgjuVxmJkpukIilMHLplI.0IDcjLxoLv0nm', '0500000000', 'admin'),
-('Saud Alqahtani',    'saud@example.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0551112222', 'customer'),
-('Mohammed Alharbi',  'mohd@example.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0553334444', 'customer'),
-('Fahad Alotaibi',    'fahad@example.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0555556666', 'customer'),
-('Nawaf Aldossari',   'nawaf@example.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0557778888', 'customer'),
-('Yousef Alshehri',   'yousef@example.com','$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0559990000', 'customer'),
-('Khalid Al Nakheel', 'khalid@courts.com', '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0561234567', 'owner'),
-('Rakan Padel Group', 'rakan@courts.com',  '$2y$12$LrYa8W.U3ybulhTu01CcLOe9bPtAwvEs0KP5g/VuoM049H9fdf2Y.', '0567654321', 'owner');
-
-CREATE TABLE courts (
+CREATE TABLE IF NOT EXISTS courts (
     court_id       INT AUTO_INCREMENT PRIMARY KEY,
     name           VARCHAR(100) NOT NULL,
     sport_type     ENUM('Football','Padel','Basketball','Volleyball','Tennis') NOT NULL,
@@ -58,16 +42,7 @@ CREATE TABLE courts (
     CONSTRAINT chk_court_price CHECK (price_per_hour > 0)
 );
 
--- owner_id 7 = Khalid Al Nakheel, 8 = Rakan Padel Group (the two seed owners).
-INSERT INTO courts (name, sport_type, location, price_per_hour, status, owner_id) VALUES
-('Al Nakheel Football Field',  'Football',   'Al Nakheel District, Riyadh',  180.00, 'available', 7),
-('Padel Pro Court 1',          'Padel',      'Al Olaya District, Riyadh',    120.00, 'available', 8),
-('Padel Pro Court 2',          'Padel',      'Al Olaya District, Riyadh',    120.00, 'available', 8),
-('Slam Basketball Court',      'Basketball', 'Al Malqa District, Riyadh',     90.00, 'available', 7),
-('Beach Volleyball Arena',     'Volleyball', 'Al Yasmin District, Riyadh',    75.00, 'available', 8),
-('Center Court Tennis',        'Tennis',     'Diplomatic Quarter, Riyadh',   100.00, 'maintenance', 7);
-
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
     booking_id   INT AUTO_INCREMENT PRIMARY KEY,
     user_id      INT NOT NULL,
     court_id     INT NOT NULL,
@@ -107,22 +82,9 @@ CREATE TABLE bookings (
     CONSTRAINT chk_price CHECK (total_price >= 0)
 );
 
--- Dates are relative to the day this file is imported, so the sample data is
--- always current: a few upcoming bookings you can edit or cancel, plus one in
--- the past and one already cancelled.
-INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time, total_price, status) VALUES
-(2, 1, CURDATE() + INTERVAL 1 DAY,  '18:00:00', '20:00:00', 360.00, 'confirmed'),
-(3, 2, CURDATE() + INTERVAL 2 DAY,  '19:00:00', '20:00:00', 120.00, 'confirmed'),
-(4, 4, CURDATE() + INTERVAL 3 DAY,  '17:00:00', '19:00:00', 180.00, 'confirmed'),
-(5, 5, CURDATE() + INTERVAL 4 DAY,  '16:00:00', '17:00:00',  75.00, 'confirmed'),
-(6, 3, CURDATE() + INTERVAL 5 DAY,  '20:00:00', '22:00:00', 240.00, 'confirmed'),
-(2, 3, CURDATE() + INTERVAL 6 DAY,  '20:00:00', '22:00:00', 240.00, 'confirmed'),
-(2, 1, CURDATE() - INTERVAL 7 DAY,  '18:00:00', '19:00:00', 180.00, 'confirmed'),
-(2, 2, CURDATE() + INTERVAL 2 DAY,  '18:00:00', '19:00:00', 120.00, 'cancelled');
-
 -- Failed logins, used to slow down password guessing (see includes/throttle.php).
 -- Rows older than a day are purged automatically.
-CREATE TABLE login_attempts (
+CREATE TABLE IF NOT EXISTS login_attempts (
     attempt_id   INT AUTO_INCREMENT PRIMARY KEY,
     email        VARCHAR(120) NOT NULL,
     ip           VARCHAR(45)  NOT NULL,
