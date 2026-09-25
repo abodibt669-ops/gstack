@@ -154,7 +154,7 @@ function csrf_field(): Html {
 function csrf_check(): void {
     $sent = $_POST['csrf_token'] ?? '';
     if (!is_string($sent) || !hash_equals(csrf_token(), $sent)) {
-        http_response_code(419);
+        http_response_code(403);   // 403, not 419: Apache turns unknown codes into 500
         exit('Your session expired, or this form was submitted from another site. Please go back and try again.');
     }
 }
