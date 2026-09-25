@@ -33,7 +33,10 @@ if (isPost()) {
 
             login_succeeded($conn, $email);
             loginUser($user);
-            redirect($user['role'] === 'admin' ? 'admin/dashboard.php' : 'courts.php');
+
+            // Each role lands on its own home.
+            $home = ['admin' => 'admin/dashboard.php', 'owner' => 'owner/dashboard.php'];
+            redirect($home[$user['role']] ?? 'courts.php');
         }
 
         login_failed($conn, $email);
