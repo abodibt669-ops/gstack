@@ -46,6 +46,12 @@ On nginx, add equivalent rules — `.htaccess` is ignored there.
 Serve the site over HTTPS only, then add an HSTS header at the host.
 
 ## 6. Login protection
-After 5 failed logins for one email (or 20 from one IP) within 15 minutes, logins for it are
-refused for 15 minutes. If the site sits behind a proxy/CDN (e.g. Cloudflare), configure Apache
-`mod_remoteip` so the real visitor IP is used — otherwise every visitor shares the proxy's IP.
+Within any 15 minutes, logins are refused for 15 minutes after:
+- 5 failures for one email **from one IP**: that email is locked on that device only, so someone
+  guessing a customer's password cannot lock the customer out on their own device;
+- 20 failures from one IP, whichever emails they tried;
+- 50 failures for one email across all IPs together (guessing spread over many addresses).
+
+A successful login clears that email's failures. If the site sits behind a proxy/CDN (e.g.
+Cloudflare), configure Apache `mod_remoteip` so the real visitor IP is used — otherwise every
+visitor shares the proxy's IP, and the per-IP limits then apply to everyone at once.
