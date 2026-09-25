@@ -200,13 +200,15 @@ function payments_with(array $env): array {
         $prefix .= $k . '=' . escapeshellarg($v) . ' ';
     }
     // env -u clears anything inherited, so the machine running the tests
-    // cannot leak its own MALAEB_ENV or keys into a case.
-    $cmd = 'env -u MALAEB_ENV -u WAGTI_PAYMENTS_MODE -u MOYASAR_SECRET_KEY -u MOYASAR_PUBLISHABLE_KEY '
+    // cannot leak its own MALAEB_ENV, keys or base URL into a case.
+    $cmd = 'env -u MALAEB_ENV -u WAGTI_PAYMENTS_MODE -u MOYASAR_SECRET_KEY -u MOYASAR_PUBLISHABLE_KEY -u WAGTI_BASE_URL '
          . $prefix . 'php -r ' . escapeshellarg($code) . ' 2>&1';
     $out = (string) shell_exec($cmd);
     $json = substr($out, (int) strrpos($out, 'JSON:') + 5);
     $r = json_decode($json, true) ?: [];
     $r['logged_disabled'] = str_contains($out, 'payments are DISABLED');
+    $r['logged_keys']     = str_contains($out, 'Production needs WAGTI_PAYMENTS_MODE');
+    $r['logged_base_url'] = str_contains($out, 'Production needs WAGTI_BASE_URL');
     return $r;
 }
 
@@ -214,25 +216,78 @@ $local = payments_with([]);
 check('on your own machine (no MALAEB_ENV) payments stay available', true, $local['available'] ?? null);
 check('...and the simulated checkout still confirms, as before',      true, $local['forged_paid'] ?? null);
 
-$prodSim = payments_with(['MALAEB_ENV' => 'production']);
+// Every production case below except the WAGTI_BASE_URL ones sets a valid https
+// base URL, so it can only fail for the reason it names.
+const GOOD_BASE = 'https://wagti.example.com';
+
+$prodSim = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_BASE_URL' => GOOD_BASE]);
 check('production with no payments mode set: payments are switched off', false, $prodSim['available'] ?? null);
 check('...a forged "paid" from the test checkout does NOT confirm',       false, $prodSim['forged_paid'] ?? null);
 check('...no invoice can be started either',                             false, $prodSim['invoice_ok'] ?? null);
 check('...and the server log says why',                                   true,  $prodSim['logged_disabled']);
 
-$prodPlaceholder = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live']);
+$prodPlaceholder = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live',
+                                  'WAGTI_BASE_URL' => GOOD_BASE]);
 check('production in live mode with placeholder keys: still switched off', false, $prodPlaceholder['available'] ?? null);
 check('...and a forged "paid" still does not confirm',                    false, $prodPlaceholder['forged_paid'] ?? null);
 
 $prodHalfKeys = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live',
-                               'MOYASAR_SECRET_KEY' => 'sk_live_realvalue123']);
+                               'MOYASAR_SECRET_KEY' => 'sk_live_realvalue123',
+                               'WAGTI_BASE_URL' => GOOD_BASE]);
 check('production with only one real key: still switched off', false, $prodHalfKeys['available'] ?? null);
 
-$prodReady = payments_with(['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live',
-                            'MOYASAR_SECRET_KEY' => 'sk_live_realvalue123',
-                            'MOYASAR_PUBLISHABLE_KEY' => 'pk_live_realvalue123']);
-check('production in live mode with both real keys: payments are on', true,  $prodReady['available'] ?? null);
-check('...and nothing is logged as disabled',                          false, $prodReady['logged_disabled']);
+// ---------------------------------------------------------------
+echo "\nProduction also needs WAGTI_BASE_URL to be an https:// address\n";
+// ---------------------------------------------------------------
+
+// Everything else is ready: live mode and both real keys.
+function prod_live_with_base(?string $base): array {
+    $env = ['MALAEB_ENV' => 'production', 'WAGTI_PAYMENTS_MODE' => 'live',
+            'MOYASAR_SECRET_KEY' => 'sk_live_realvalue123',
+            'MOYASAR_PUBLISHABLE_KEY' => 'pk_live_realvalue123'];
+    if ($base !== null) {
+        $env['WAGTI_BASE_URL'] = $base;
+    }
+    return payments_with($env);
+}
+
+$noBase = prod_live_with_base(null);
+check('live + real keys but no WAGTI_BASE_URL: payments are switched off', false, $noBase['available'] ?? null);
+check('...a callback cannot confirm a booking',                           false, $noBase['forged_paid'] ?? null);
+check('...no invoice can be started',                                     false, $noBase['invoice_ok'] ?? null);
+check('...the log names WAGTI_BASE_URL as what is missing',               true,  $noBase['logged_base_url']);
+check('...and does not wrongly blame the keys',                           false, $noBase['logged_keys']);
+
+$httpBase = prod_live_with_base('http://wagti.example.com');
+check('an http:// WAGTI_BASE_URL: still switched off',  false, $httpBase['available'] ?? null);
+check('...and a callback still cannot confirm',         false, $httpBase['forged_paid'] ?? null);
+check('...and the log says why',                        true,  $httpBase['logged_base_url']);
+
+// A one-slash typo starts with https:// but has no host, so the callback would
+// fall back to the forgeable Host header, the very thing this check exists to
+// stop. (Plain "https://" is no test of this: trailing slashes are trimmed off
+// WAGTI_BASE_URL, leaving "https:", which fails a prefix check anyway.)
+$noHost = prod_live_with_base('https:///wagti');
+check('"https:///wagti" (no host): still switched off', false, $noHost['available'] ?? null);
+
+$prodReady = prod_live_with_base(GOOD_BASE);
+check('live + real keys + https:// WAGTI_BASE_URL: payments are on', true,  $prodReady['available'] ?? null);
+check('...and nothing is logged as disabled',                        false, $prodReady['logged_disabled']);
+
+$localHttp = payments_with(['WAGTI_BASE_URL' => 'http://localhost/malaeb']);
+check('on your own machine an http:// base URL is still fine',       true,  $localHttp['available'] ?? null);
+
+// pay.php needs a database, which this suite deliberately runs without, so its
+// message is checked on a real server; this pins the wiring it depends on: the
+// guard comes before both the test checkout and invoice creation.
+$paySrc   = file_get_contents(__DIR__ . '/../pay.php');
+$guardPos = strpos($paySrc, 'if (!PAYMENTS_AVAILABLE)');
+check('pay.php checks PAYMENTS_AVAILABLE before showing the test checkout',
+    true, $guardPos !== false && $guardPos < (int) strpos($paySrc, "view('pay.html'"));
+check('...and before starting an invoice',
+    true, $guardPos !== false && $guardPos < (int) strpos($paySrc, 'moyasar_create_invoice('));
+check('...and tells the customer payment is temporarily unavailable',
+    true, str_contains($paySrc, 'Online payment is temporarily unavailable'));
 
 echo "\n" . str_repeat('-', 46) . "\n";
 echo "{$passed} passed, {$failed} failed\n";

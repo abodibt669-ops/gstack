@@ -28,14 +28,15 @@ Run it with the same `MALAEB_DB_*` environment variables as the site.
 | `MALAEB_DB_HOST` / `MALAEB_DB_USER` / `MALAEB_DB_PASS` / `MALAEB_DB_NAME` | a dedicated DB user — not root with an empty password |
 | `WAGTI_PAYMENTS_MODE` | `live` |
 | `MOYASAR_SECRET_KEY` / `MOYASAR_PUBLISHABLE_KEY` | your real keys from the Moyasar dashboard |
-| `WAGTI_BASE_URL` | the site's public address, e.g. `https://wagti.example.com` (include the subfolder if the site lives in one). The payment callback URL is built from it; when unset it falls back to the visitor's `Host` header, which a visitor can forge. |
+| `WAGTI_BASE_URL` | **Required.** The site's public `https://` address, e.g. `https://wagti.example.com` (include the subfolder if the site lives in one). The payment callback URL is built from it; without it the callback would come from the visitor's `Host` header, which a visitor can forge, so payments stay off until it is set. |
 | `MOYASAR_API_BASE` | **leave unset** (defaults to `https://api.moyasar.com/v1`). It exists only so tests can point at a stub gateway; set on a real server, your secret key would be sent to whatever it points at. |
 
 With Apache + mod_php (the XAMPP setup), set these with `SetEnv NAME value` in the virtual host.
 
-With `MALAEB_ENV=production`, payments stay **switched off** until `WAGTI_PAYMENTS_MODE=live`
-and both real keys are set; customers see "Online payment is temporarily unavailable" and the
-server log says why. On your own machine (no `MALAEB_ENV`) the simulated checkout works as before.
+With `MALAEB_ENV=production`, payments stay **switched off** until `WAGTI_PAYMENTS_MODE=live`,
+both real keys are set, and `WAGTI_BASE_URL` is the site's `https://` address; customers see
+"Online payment is temporarily unavailable" and the server log names what is missing.
+On your own machine (no `MALAEB_ENV`) the simulated checkout works as before.
 
 ## 5. Web server
 The `.htaccess` files block `*.sql`, `*.md`, hidden files, `.git/`, `config/`, `includes/`,
