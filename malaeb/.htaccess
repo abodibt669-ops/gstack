@@ -1,0 +1,43 @@
+# ============================================================
+#  Web-root guard: pages are served, everything else is not.
+#  Without this, a visitor could download database.sql (names, emails,
+#  phone numbers, password hashes), README.md (test logins) or .git/
+#  (the whole source history if the site is deployed with git clone).
+#  Apache 2.4 syntax first, then the 2.2 form for older XAMPP builds.
+# ============================================================
+
+# Schema dumps, docs, logs and backups.
+<FilesMatch "\.(sql|md|log|bak|ini)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Hidden files such as .env or .gitignore.
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# The .git folder, if the site is deployed straight from the repository.
+<IfModule mod_alias.c>
+    RedirectMatch 404 /\.git(/|$)
+</IfModule>
+
+# Basic security headers: no framing by other sites (clickjacking),
+# no MIME sniffing, and a sensible referrer policy.
+# (Add HSTS at the host once the site is HTTPS-only.)
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

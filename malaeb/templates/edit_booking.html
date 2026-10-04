@@ -1,0 +1,28 @@
+<section class="section container">
+  <div class="card form-card">
+    <h1>{{t:Edit booking}}</h1>
+    <p class="muted"><bdi>{{court_name}}</bdi> · <bdi>{{price}} {{t:SAR/hr}}</bdi></p>
+    {{alerts}}
+
+    <form id="bookingForm" method="POST" action="edit_booking.php" data-rate="{{rate}}">
+      {{csrf}}
+      <input type="hidden" name="booking_id" value="{{booking_id}}">
+
+      <label for="booking_date">{{t:Date}}</label>
+      <input type="date" id="booking_date" name="booking_date" value="{{date}}" max="{{max_date}}" required>
+
+      <label for="start_time">{{t:Start time}}</label>
+      <input type="time" id="start_time" name="start_time" step="1800" value="{{start}}" required>
+
+      <label for="end_time">{{t:End time}}</label>
+      <input type="time" id="end_time" name="end_time" step="1800" value="{{end}}" required>
+
+      <p class="form-hint">{{t:Estimated total:}} <strong id="livePrice" aria-live="polite">--</strong></p>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{{t:Save changes}}</button>
+        <a class="btn btn-dark btn-sm" href="my_bookings.php">{{t:Back}}</a>
+      </div>
+    </form>
+  </div>
+</section>

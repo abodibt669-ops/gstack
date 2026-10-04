@@ -1,0 +1,9 @@
+# These files are meant to be included by the pages, never opened in a browser.
+# Apache 2.4 syntax first, with the 2.2 form after it for older XAMPP builds.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
