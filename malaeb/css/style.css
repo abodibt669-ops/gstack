@@ -10,6 +10,8 @@
 @font-face{font-family:'Barlow';src:url('../fonts/Barlow-ExtraBold.ttf') format('truetype');font-weight:800;font-display:swap}
 @font-face{font-family:'Space Mono';src:url('../fonts/SpaceMono-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
 @font-face{font-family:'Space Mono';src:url('../fonts/SpaceMono-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+/* Arabic: Cairo (SIL OFL, fonts/Cairo-OFL.txt). Variable weight, Arabic glyphs only. */
+@font-face{font-family:'Cairo';src:url('../fonts/Cairo-Arabic-Variable.woff2') format('woff2-variations'),url('../fonts/Cairo-Arabic-Variable.woff2') format('woff2');font-weight:200 1000;font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
 
 :root{
   --chalk:#F1F3EC; --pitch:#0C271F; --pitch-2:#123528; --ink:#0A0F0D;
@@ -31,8 +33,8 @@ a{color:inherit;text-decoration:none}
 img{max-width:100%}
 .container{max-width:1180px;margin:0 auto;padding:0 24px}
 .muted{color:#6b776f}
-.skip-link{position:absolute;left:-999px;top:0;background:var(--pitch);color:#fff;padding:10px 16px;border-radius:8px;z-index:100}
-.skip-link:focus{left:12px;top:12px}
+.skip-link{position:absolute;inset-inline-start:-999px;top:0;background:var(--pitch);color:#fff;padding:10px 16px;border-radius:8px;z-index:100}
+.skip-link:focus{inset-inline-start:12px;top:12px}
 
 /* ---------- NAV ---------- */
 .site-header{position:sticky;top:0;z-index:50;background:rgba(241,243,236,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -43,7 +45,7 @@ img{max-width:100%}
   background-size:2px 100%,100% 100%;background-position:center;background-repeat:no-repeat}
 .nav-links{list-style:none;display:flex;align-items:center;gap:26px}
 .nav-links a{font-weight:600;font-size:15px;position:relative;color:var(--pitch)}
-.nav-links a:not(.btn)::after{content:"";position:absolute;left:0;bottom:-5px;height:2px;width:0;background:var(--flare);transition:width .25s}
+.nav-links a:not(.btn)::after{content:"";position:absolute;inset-inline-start:0;bottom:-5px;height:2px;width:0;background:var(--flare);transition:width .25s}
 .nav-links a:not(.btn):hover::after{width:100%}
 
 /* ---------- BUTTONS ---------- */
@@ -77,7 +79,7 @@ img{max-width:100%}
 /* hero search — scoreboard-style card */
 .hero-search{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;background:var(--pitch);border-radius:16px;padding:18px;box-shadow:var(--shadow);max-width:620px;opacity:0;transform:translateY(16px);animation:heroUp .8s ease .32s forwards}
 .hero-search .hs-field{flex:1;min-width:150px}
-.hero-search label{display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--volt);margin:0 0 7px 2px}
+.hero-search label{display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--volt);margin:0 0 7px;margin-inline-start:2px}
 .hero-search select,.hero-search input{width:100%;margin:0;border:2px solid rgba(241,243,236,.18);background:#0a1f19;color:var(--chalk);border-radius:10px;padding:12px 13px;font-size:15px}
 .hero-search select:focus,.hero-search input:focus{border-color:var(--volt);outline:none}
 .hero-search input::placeholder{color:rgba(241,243,236,.55)}
@@ -88,11 +90,11 @@ img{max-width:100%}
 /* hero stats — real numbers */
 .hero-stats{list-style:none;display:flex;gap:34px;flex-wrap:wrap;margin-top:26px;opacity:0;transform:translateY(12px);animation:heroUp .8s ease .5s forwards}
 .hero-stats .hs-num{font-family:'Anton',sans-serif;font-size:40px;color:var(--pitch);line-height:.9;display:block}
-.hero-stats .hs-num small{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#5c6a63;margin-left:4px}
+.hero-stats .hs-num small{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#5c6a63;margin-inline-start:4px}
 .hero-stats .hs-lbl{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5c6a63;margin-top:4px;display:block}
 
 /* ---------- MARQUEE ---------- */
-.marquee{background:var(--ink);color:var(--chalk);padding:13px 0;overflow:hidden;white-space:nowrap;border-top:3px solid var(--volt);border-bottom:3px solid var(--volt)}
+.marquee{direction:ltr;background:var(--ink);color:var(--chalk);padding:13px 0;overflow:hidden;white-space:nowrap;border-top:3px solid var(--volt);border-bottom:3px solid var(--volt)}
 .marquee .track{display:inline-block;font-family:'Anton',sans-serif;font-size:19px;letter-spacing:.05em;text-transform:uppercase;animation:scroll 24s linear infinite}
 .marquee .track b{color:var(--volt);margin:0 16px}
 @keyframes scroll{to{transform:translateX(-50%)}}
@@ -105,8 +107,8 @@ img{max-width:100%}
 /* ---------- CARDS ---------- */
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
 .court-card{position:relative;overflow:hidden;padding:22px 22px 18px;--sport:var(--pitch);--sport-ink:var(--pitch);transition:transform .3s cubic-bezier(.2,.9,.25,1),box-shadow .3s}
-.court-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--sport)}
-.court-card::after{content:"";position:absolute;right:-45px;top:-45px;width:130px;height:130px;border-radius:50%;background:var(--sport);filter:blur(46px);opacity:0;transition:opacity .35s}
+.court-card::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:6px;background:var(--sport)}
+.court-card::after{content:"";position:absolute;inset-inline-end:-45px;top:-45px;width:130px;height:130px;border-radius:50%;background:var(--sport);filter:blur(46px);opacity:0;transition:opacity .35s}
 .court-card:hover{transform:translateY(-8px);box-shadow:0 30px 50px -28px rgba(10,15,13,.5)}
 .court-card:hover::after{opacity:.26}
 .court-card[data-sport="Football"]{--sport:var(--football);--sport-ink:var(--football-ink)}
@@ -137,14 +139,14 @@ input:focus,select:focus{outline:none;border-color:var(--flare)}
 .filter-bar .btn{margin:0}
 
 /* ---------- ALERTS ---------- */
-.alert{padding:13px 16px;border-radius:11px;font-weight:600;font-size:15px;margin:16px 0;border-left:5px solid}
+.alert{padding:13px 16px;border-radius:11px;font-weight:600;font-size:15px;margin:16px 0;border-inline-start:5px solid}
 .alert-success{background:#eafbef;color:#12673a;border-color:var(--football)}
 .alert-error{background:#fdeee9;color:#b23a17;border-color:var(--flare)}
 
 /* ---------- TABLES (my bookings / admin) ---------- */
 .table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:14px}
 table{border-collapse:collapse;width:100%;min-width:560px}
-th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);font-size:15px}
+th,td{padding:14px 16px;text-align:start;border-bottom:1px solid var(--line);font-size:15px}
 th{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pitch);background:var(--chalk)}
 tr:last-child td{border-bottom:none}
 .row-actions{display:flex;gap:8px}
@@ -186,7 +188,7 @@ tr:last-child td{border-bottom:none}
 .pay-amount{display:flex;align-items:baseline;justify-content:space-between;background:var(--chalk);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:18px 0}
 .pay-amount-lbl{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5c6a63}
 .pay-amount-val{font-family:'Anton',sans-serif;font-size:34px;color:var(--pitch);line-height:1}
-.pay-amount-val small{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#6b776f;margin-left:2px}
+.pay-amount-val small{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#6b776f;margin-inline-start:2px}
 
 /* ---------- BOOKING STATUS PILLS ---------- */
 .status-confirmed,.status-pending,.status-cancelled{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px;display:inline-block}
@@ -200,4 +202,48 @@ tr:last-child td{border-bottom:none}
 
 /* A court its owner has taken off the public listing. Same shape as the other
    row badges; colour checked against the row background for contrast. */
-.badge-hidden{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px;background:#f0f1ee;color:#5f6a63;margin-left:8px}
+.badge-hidden{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px;background:#f0f1ee;color:#5f6a63;margin-inline-start:8px}
+
+/* ---------- LANGUAGE ---------- */
+.lang-switch{display:inline-flex;align-items:center;font-weight:700;font-size:14px;padding:6px 12px;border:2px solid var(--pitch);border-radius:100px;color:var(--pitch);line-height:1.2}
+.lang-switch:hover{background:var(--pitch);color:var(--chalk)}
+.nav-links a.lang-switch::after{display:none}
+.lang-switch[lang="ar"]{font-family:'Cairo','Barlow',system-ui,sans-serif}
+.lang-switch[lang="en"]{font-family:'Barlow',system-ui,sans-serif}
+
+/* Arabic: Cairo everywhere (Latin falls through to the original fonts),
+   no letter-spacing (it breaks joined Arabic letters), no uppercase, and a
+   taller line-height for the headings Anton made tight. */
+html[lang="ar"] body,
+html[lang="ar"] h1,html[lang="ar"] h2,html[lang="ar"] h3,
+html[lang="ar"] .brand,html[lang="ar"] .section-title,html[lang="ar"] .stat .num,
+html[lang="ar"] .btn,html[lang="ar"] input,html[lang="ar"] select,html[lang="ar"] button,
+html[lang="ar"] .hero-eyebrow,html[lang="ar"] .hero-search label,html[lang="ar"] .hs-lbl,
+html[lang="ar"] .hs-num small,html[lang="ar"] .marquee .track,html[lang="ar"] .sport-tag,
+html[lang="ar"] .price span,html[lang="ar"] th,html[lang="ar"] .stat .lbl,
+html[lang="ar"] .footer-inner strong,html[lang="ar"] .footer-inner .muted,
+html[lang="ar"] .pay-amount-lbl,html[lang="ar"] .pay-amount-val small,
+html[lang="ar"] .status-confirmed,html[lang="ar"] .status-pending,html[lang="ar"] .status-cancelled,
+html[lang="ar"] .status-maintenance,html[lang="ar"] .status-unavailable,html[lang="ar"] .badge-hidden,
+html[lang="ar"] .badge-maint{font-family:'Cairo','Barlow',system-ui,sans-serif;letter-spacing:0;text-transform:none}
+html[lang="ar"] h1,html[lang="ar"] h2,html[lang="ar"] h3,html[lang="ar"] .brand,
+html[lang="ar"] .section-title,html[lang="ar"] .stat .num{font-weight:800;line-height:1.3}
+html[lang="ar"] .price,html[lang="ar"] .hs-num,html[lang="ar"] .pay-amount-val{font-family:'Space Mono','Cairo',monospace}
+html[lang="ar"] .hero-search label{font-size:13px}
+/* Phones: the nav now carries one more item (the language switch), so keep
+   every label on one line and tighten spacing rather than letting them wrap. */
+.nav-links a{white-space:nowrap}
+@media(max-width:480px){
+  .nav-links{gap:10px}
+  .nav-links a{font-size:13px}
+  .nav-links .btn{padding:8px 12px;font-size:13px}
+  .lang-switch{padding:5px 9px;font-size:12px}
+  .brand{font-size:22px;gap:7px}
+  .brand::before{width:22px;height:22px}
+  /* the name in "Logout (Name)" is what pushed the bar off-screen */
+  .nav-name{display:none}
+  /* if a role still has more links than fit, wrap to a second row
+     instead of scrolling the whole page sideways */
+  .nav{flex-wrap:wrap;height:auto;min-height:64px;padding-block:10px;row-gap:8px}
+  .nav-links{flex-wrap:wrap;row-gap:8px}
+}

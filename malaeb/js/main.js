@@ -1,4 +1,11 @@
 // just handles the booking form (dates/price) and the confirm popups
+// Wording the script itself shows, in the page's language (<html lang>).
+const AR = document.documentElement.lang === "ar";
+const TXT = {
+  sar: AR ? " ر.س" : " SAR",
+  endAfterStart: AR ? "وقت النهاية لازم يكون بعد وقت البداية." : "End time must be after start time.",
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const bookingForm = document.getElementById("bookingForm");
   if (bookingForm) {
@@ -33,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       const hours = (minutes(endInput.value) - minutes(startInput.value)) / 60;
-      priceBox.textContent = hours > 0 ? (hours * rate).toFixed(2) + " SAR" : "--";
+      priceBox.textContent = hours > 0 ? (hours * rate).toFixed(2) + TXT.sar : "--";
     }
 
     // "input" as well as "change", so the total keeps up while someone is still
@@ -52,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // by luck only while every value has a leading zero.
       if (minutes(endInput.value) <= minutes(startInput.value)) {
         e.preventDefault();
-        alert("End time must be after start time.");
+        alert(TXT.endAfterStart);
       }
     });
   }
@@ -61,7 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // forms now, so saying "no" has to stop the submit, not just the click.
   document.querySelectorAll("[data-confirm]").forEach((el) => {
     el.addEventListener("click", (e) => {
-      if (!confirm(el.dataset.confirm)) {
+      // An empty data-confirm (e.g. "Publish") means no question to ask.
+      if (el.dataset.confirm && !confirm(el.dataset.confirm)) {
         e.preventDefault();
         e.stopPropagation();
       }

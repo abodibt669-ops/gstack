@@ -19,6 +19,8 @@
 
 defined('MALAEB') or exit('Direct access is not allowed.');
 
+require_once __DIR__ . '/i18n.php';
+
 // A tiny wrapper meaning "this string is already HTML, do not escape it".
 final class Html {
     public function __construct(public readonly string $html) {}
@@ -37,6 +39,7 @@ function e(mixed $value): string {
 }
 
 // Load one pure-HTML template and replace its {{placeholders}} in a single pass.
+// {{t:Some English text}} is translated (see i18n.php) and escaped like any value.
 function view(string $file, array $data = []): Html {
     // Template names come from our own code, never from the user, but block
     // traversal anyway so a later refactor cannot turn this into a file-read hole.
@@ -51,9 +54,12 @@ function view(string $file, array $data = []): Html {
     $html = file_get_contents($path);
 
     return raw(preg_replace_callback(
-        '/\{\{\s*(\w+)\s*\}\}/',
+        '/\{\{\s*(?:t:([^{}]+?)|(\w+))\s*\}\}/',
         static function (array $m) use ($data, $file): string {
-            $key = $m[1];
+            if (($m[1] ?? '') !== '') {
+                return e(__(trim($m[1])));
+            }
+            $key = $m[2];
             if (!array_key_exists($key, $data)) {
                 // An unfilled blank is a bug in the calling .php file. Render
                 // nothing rather than printing "{{price}}" at the customer.
@@ -72,26 +78,37 @@ function view(string $file, array $data = []): Html {
 function render_page(string $title, Html $content, string $base = ''): void {
     // the only part of the nav that changes: it depends on who is logged in
     if (isLoggedIn()) {
-        $navAuth  = '<li><a href="' . e($base) . 'my_bookings.php">My Bookings</a></li>';
+        $navAuth  = '<li><a href="' . e($base) . 'my_bookings.php">' . e(__('My Bookings')) . '</a></li>';
         if (isOwner()) {
-            $navAuth .= '<li><a href="' . e($base) . 'owner/dashboard.php">My Courts</a></li>';
+            $navAuth .= '<li><a href="' . e($base) . 'owner/dashboard.php">' . e(__('My Courts')) . '</a></li>';
         }
         if (isAdmin()) {
-            $navAuth .= '<li><a href="' . e($base) . 'admin/dashboard.php">Admin</a></li>';
+            $navAuth .= '<li><a href="' . e($base) . 'admin/dashboard.php">' . e(__('Admin')) . '</a></li>';
         }
-        $navAuth .= '<li><a class="btn btn-outline btn-sm" href="' . e($base) . 'logout.php">Logout ('
-                  . e($_SESSION['full_name'] ?? '') . ')</a></li>';
+        $navAuth .= '<li><a class="btn btn-outline btn-sm" href="' . e($base) . 'logout.php">'
+                  . e(__('Logout')) . ' <span class="nav-name">(' . e($_SESSION['full_name'] ?? '') . ')</span></a></li>';
     } else {
-        $navAuth  = '<li><a href="' . e($base) . 'login.php">Login</a></li>'
-                  . '<li><a class="btn btn-primary btn-sm" href="' . e($base) . 'register.php">Register</a></li>';
+        $navAuth  = '<li><a href="' . e($base) . 'login.php">' . e(__('Login')) . '</a></li>'
+                  . '<li><a class="btn btn-primary btn-sm" href="' . e($base) . 'register.php">' . e(__('Register')) . '</a></li>';
     }
+
+    // The switcher always names the OTHER language, in that language.
+    $other      = current_lang() === 'ar' ? 'en' : 'ar';
+    $langSwitch = '<a class="lang-switch" href="' . e(lang_switch_url()) . '" hreflang="' . $other
+                . '" lang="' . $other . '">' . ($other === 'ar' ? 'العربية' : 'English') . '</a>';
 
     if (!headers_sent()) {
         header('Content-Type: text/html; charset=UTF-8');
+        header('Content-Language: ' . current_lang());
+        // The same URL answers in two languages, so caches must key on these.
+        header('Vary: Cookie, Accept-Language');
     }
     echo view('layout.html', [
-        'title'    => $title . ' | Wagti',
+        'title'    => __($title) . ' | ' . __('Wagti'),
         'base'     => $base,
+        'lang'     => current_lang(),
+        'dir'      => lang_dir(),
+        'lang_switch' => raw($langSwitch),
         'nav_auth' => raw($navAuth),
         'content'  => $content,
     ]);
