@@ -87,11 +87,11 @@ return [
     // --- courts listing & booking ----------------------------------------
     'All courts'                => 'كل الملاعب',
     'All sports'                => 'كل الرياضات',
-    'Max price (SAR/hr)'        => 'أعلى سعر (ر.س/ساعة)',
+    'Max price (SAR/hr)'        => 'أعلى سعر (ر.س للساعة)',
     'Filter'                    => 'تصفية',
     'Book'                      => 'احجز',
     'SAR'                       => 'ر.س',
-    'SAR/hr'                    => 'ر.س/ساعة',
+    'SAR/hr'                    => 'ر.س للساعة',
     'No courts match your filter. Try widening the price or choosing another sport.'
         => 'ما فيه ملاعب تطابق البحث. جرّب سعر أعلى أو رياضة ثانية.',
     'Date'                      => 'التاريخ',

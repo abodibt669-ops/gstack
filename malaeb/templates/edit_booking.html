@@ -1,7 +1,7 @@
 <section class="section container">
   <div class="card form-card">
     <h1>{{t:Edit booking}}</h1>
-    <p class="muted">{{court_name}} - {{price}} {{t:SAR/hr}}</p>
+    <p class="muted"><bdi>{{court_name}}</bdi> · <bdi>{{price}} {{t:SAR/hr}}</bdi></p>
     {{alerts}}
 
     <form id="bookingForm" method="POST" action="edit_booking.php" data-rate="{{rate}}">

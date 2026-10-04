@@ -100,7 +100,9 @@ img{max-width:100%}
 @keyframes scroll{to{transform:translateX(-50%)}}
 
 /* ---------- SECTIONS ---------- */
-.section{padding:72px 0}
+/* padding-block, not padding: these sit on .container too (class="section container"),
+   and a shorthand here wiped out its side padding, so on phones text ran to the edge. */
+.section{padding-block:72px}
 .section-title{font-size:clamp(32px,4.4vw,52px);color:var(--pitch);margin-bottom:32px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 
