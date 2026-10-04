@@ -21,8 +21,8 @@ if (isPost() && input($_POST, 'action') === 'cancel') {
     // Say something either way. The old code showed a blank message when the
     // cancel did nothing, so a failed cancel looked identical to a page reload.
     $stmt->affected_rows
-        ? flash('success', "Booking cancelled.")
-        : flash('error', "That booking could not be cancelled. It may already be cancelled.");
+        ? flash('success', __("Booking cancelled."))
+        : flash('error', __("That booking could not be cancelled. It may already be cancelled."));
     redirect('my_bookings.php');
 }
 
@@ -49,28 +49,28 @@ if ($bookings->num_rows === 0) {
 
         if ($b['status'] === 'confirmed' && !$isPast) {
             $actions = '<div class="row-actions">'
-                . '<a class="btn btn-dark btn-sm" href="edit_booking.php?id=' . (int)$b['booking_id'] . '">Edit</a>'
+                . '<a class="btn btn-dark btn-sm" href="edit_booking.php?id=' . (int)$b['booking_id'] . '">' . e(__('Edit')) . '</a>'
                 . post_button('my_bookings.php',
                     ['action' => 'cancel', 'booking_id' => $b['booking_id']],
-                    'Cancel', 'btn btn-danger btn-sm', 'Cancel this booking?')->html
+                    __('Cancel'), 'btn btn-danger btn-sm', __('Cancel this booking?'))->html
                 . '</div>';
         } elseif ($b['status'] === 'confirmed') {
-            $actions = '<span class="muted">Past</span>';
+            $actions = '<span class="muted">' . e(__('Past')) . '</span>';
         } elseif ($b['status'] === 'pending' && !$isPast) {
             $actions = '<a class="btn btn-primary btn-sm" href="pay.php?booking_id='
-                . (int)$b['booking_id'] . '">Pay now</a>';
+                . (int)$b['booking_id'] . '">' . e(__('Pay now')) . '</a>';
         } else {
             $actions = '<span class="muted">-</span>';
         }
 
         $rows .= view('partials/booking_row.html', [
             'court_name'   => $b['court_name'],
-            'sport'        => $b['sport_type'],
+            'sport'        => __($b['sport_type']),
             'date'         => $b['booking_date'],
             'time'         => substr($b['start_time'], 0, 5) . ' - ' . substr($b['end_time'], 0, 5),
             'total'        => number_format((float)$b['total_price'], 2),
             'status_class' => $b['status'],
-            'status'       => ucfirst($b['status']),
+            'status'       => __(ucfirst($b['status'])),
             'actions'      => raw($actions),
         ])->html;
     }

@@ -14,7 +14,7 @@ if (isPost()) {
     if (login_blocked($conn, $email)) {
         // Refused without even looking at the password, so a guesser learns
         // nothing from trying more — not even a correct guess gets through.
-        $error = "Too many failed attempts. Please wait " . LOGIN_LOCK_MINUTES . " minutes and try again.";
+        $error = __('Too many failed attempts. Please wait :minutes minutes and try again.', ['minutes' => LOGIN_LOCK_MINUTES]);
     } else {
         $stmt = $conn->prepare("SELECT user_id, full_name, password, role FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -43,7 +43,7 @@ if (isPost()) {
 
         // Deliberately the same message whether or not the email exists, so this
         // page cannot be used to find out who has an account here.
-        $error = "Incorrect email or password.";
+        $error = __("Incorrect email or password.");
     }
 }
 

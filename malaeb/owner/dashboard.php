@@ -40,21 +40,21 @@ while ($c = $courts->fetch_assoc()) {
     // than leaving them wondering why nobody is booking it.
     $hiddenNote = (int)$c['is_published'] === 1
         ? ''
-        : '<span class="badge-hidden">Not visible to players</span>';
+        : '<span class="badge-hidden">' . e(__('Not visible to players')) . '</span>';
 
     $rows .= view('owner/court_row.html', [
         'name'     => $c['name'],
-        'sport'    => $c['sport_type'],
+        'sport'    => __($c['sport_type']),
         'location' => $c['location'],
         'price'    => number_format((float)$c['price_per_hour'], 0),
-        'status'   => COURT_STATUSES[$c['status']] ?? $c['status'],
+        'status'   => __(COURT_STATUSES[$c['status']] ?? $c['status']),
         'status_class' => $c['status'],
         'court_id' => (int)$c['court_id'],
         'hidden_note'  => raw($hiddenNote),
     ])->html;
 }
 if ($rows === '') {
-    $rows = '<tr><td colspan="5" class="muted">No courts yet — add your first one to start taking bookings.</td></tr>';
+    $rows = '<tr><td colspan="5" class="muted">' . e(__('No courts yet — add your first one to start taking bookings.')) . '</td></tr>';
 }
 
 // --- upcoming bookings on their courts --------------------------------
@@ -79,12 +79,12 @@ while ($b = $bk->fetch_assoc()) {
         'date'   => $b['booking_date'],
         'time'   => substr($b['start_time'], 0, 5) . '–' . substr($b['end_time'], 0, 5),
         'total'  => number_format((float)$b['total_price'], 2),
-        'status' => ucfirst($b['status']),
+        'status' => __(ucfirst($b['status'])),
         'status_class' => $b['status'],
     ])->html;
 }
 if ($bookingRows === '') {
-    $bookingRows = '<tr><td colspan="6" class="muted">No upcoming bookings yet.</td></tr>';
+    $bookingRows = '<tr><td colspan="6" class="muted">' . e(__('No upcoming bookings yet.')) . '</td></tr>';
 }
 
 $content = view('owner/dashboard.html', [

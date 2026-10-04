@@ -20,15 +20,15 @@ if (isPost()) {
     $stat  = input($_POST, 'status');
 
     if ($name === '' || mb_strlen($name) > 100) {
-        $error = "Court name is required (up to 100 characters).";
+        $error = __("Court name is required (up to 100 characters).");
     } elseif (!valid_choice($sport, SPORTS)) {
-        $error = "Please choose a sport from the list.";
+        $error = __("Please choose a sport from the list.");
     } elseif ($loc === '' || mb_strlen($loc) > 150) {
-        $error = "Location is required (up to 150 characters).";
+        $error = __("Location is required (up to 150 characters).");
     } elseif (!is_numeric($price) || (float)$price <= 0 || (float)$price > 999999) {
-        $error = "Price must be a number greater than zero.";
+        $error = __("Price must be a number greater than zero.");
     } elseif (!valid_choice($stat, COURT_STATUSES)) {
-        $error = "Please choose a valid status.";
+        $error = __("Please choose a valid status.");
     } else {
         $priceValue = round((float)$price, 2);
         $ownerId    = (int)$_SESSION['user_id'];
@@ -39,23 +39,23 @@ if (isPost()) {
         $stmt->bind_param("sssdsi", $name, $sport, $loc, $priceValue, $stat, $ownerId);
         $stmt->execute();
 
-        flash('success', "Court listed — players can book it now.");
+        flash('success', __("Court listed — players can book it now."));
         redirect('dashboard.php');
     }
 }
 
 $sportOptions = '';
 foreach (SPORTS as $s) {
-    $sportOptions .= '<option value="' . e($s) . '"' . ($sport === $s ? ' selected' : '') . '>' . e($s) . '</option>';
+    $sportOptions .= '<option value="' . e($s) . '"' . ($sport === $s ? ' selected' : '') . '>' . e(__($s)) . '</option>';
 }
 $statusOptions = '';
 foreach (COURT_STATUSES as $val => $label) {
-    $statusOptions .= '<option value="' . e($val) . '"' . ($stat === $val ? ' selected' : '') . '>' . e($label) . '</option>';
+    $statusOptions .= '<option value="' . e($val) . '"' . ($stat === $val ? ' selected' : '') . '>' . e(__($label)) . '</option>';
 }
 
 $content = view('owner/court_form.html', [
-    'heading'        => 'List a new court',
-    'submit_label'   => 'Add court',
+    'heading'        => __('List a new court'),
+    'submit_label'   => __('Add court'),
     'action'         => 'add_court.php',
     'court_id'       => '',
     'alerts'         => $error ? alert_error($error) : '',

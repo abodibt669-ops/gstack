@@ -27,15 +27,15 @@ $stmt->execute();
 $b = $stmt->get_result()->fetch_assoc();
 
 if (!$b) {
-    flash('error', 'Booking not found.');
+    flash('error', __('Booking not found.'));
     redirect('my_bookings.php');
 }
 if ($b['status'] === 'confirmed') {
-    flash('success', 'This booking is already paid.');
+    flash('success', __('This booking is already paid.'));
     redirect('my_bookings.php');
 }
 if ($b['status'] !== 'pending') {
-    flash('error', 'This booking can no longer be paid.');
+    flash('error', __('This booking can no longer be paid.'));
     redirect('my_bookings.php');
 }
 
@@ -75,7 +75,7 @@ if (!$result['paid']) {
     // Say the same thing to the customer whichever it was. A rejection message
     // that distinguishes "declined" from "that payment is not yours" would tell
     // someone probing exactly which ids are worth trying.
-    flash('error', 'Payment was not completed. You can try again from My Bookings.');
+    flash('error', __('Payment was not completed. You can try again from My Bookings.'));
     redirect('my_bookings.php');
 }
 
@@ -107,7 +107,7 @@ try {
         $rel->bind_param("ii", $bookingId, $_SESSION['user_id']);
         $rel->execute();
         $conn->commit();
-        flash('error', 'Sorry — that slot was taken while your payment was processing. It has been cancelled; you have not kept a confirmed booking.');
+        flash('error', __('Sorry — that slot was taken while your payment was processing. It has been cancelled; you have not kept a confirmed booking.'));
         redirect('my_bookings.php');
     }
 
@@ -126,5 +126,5 @@ try {
     throw $e;
 }
 
-flash('success', 'Payment confirmed — your court is booked. See you on the pitch!');
+flash('success', __('Payment confirmed — your court is booked. See you on the pitch!'));
 redirect('my_bookings.php');

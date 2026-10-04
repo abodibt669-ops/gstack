@@ -19,9 +19,24 @@ with fresh sample data, so you can always get back to a clean demo.
 ## Running the tests
 ```
 php tests/run_tests.php
+php tests/i18n_tests.php
 ```
 No database or web server needed. It checks the template filler and every
 validation rule, and confirms the passwords above still match the stored hashes.
+
+## Arabic / English
+The whole site is bilingual. The switch in the top bar (العربية / English)
+flips the page and is remembered in a `wagti_lang` cookie; a first visit
+follows the browser's language, and Arabic is the default. Arabic pages are
+right-to-left and use the Cairo font (`fonts/`, SIL Open Font License).
+
+The English sentence is the key. In PHP: `__('Booking cancelled.')`, with
+placeholders like `__('Wait :minutes minutes.', ['minutes' => 15])`. In a
+template: `{{t:Booking cancelled.}}`. The Arabic lives in
+`includes/lang/ar.php`. Adding a sentence without its Arabic makes
+`tests/i18n_tests.php` fail and shows it in English meanwhile (and logs it).
+Sport names and statuses stay English in the database and are only
+translated for display.
 
 ## How the HTML and PHP are separated
 - **`.html` files** (in `templates/`) hold ONLY the page structure. They are pure
@@ -74,6 +89,8 @@ malaeb/
   admin/dashboard.php  ...                   # admin logic (php)
   logout.php  admin/delete_court.php         # redirect only (no template)
   tests/run_tests.php         # checks the template filler and the validation rules
+  tests/i18n_tests.php        # every English sentence has an Arabic translation
+  includes/i18n.php  includes/lang/ar.php   # Arabic / English
   css/style.css   js/main.js   database.sql
 ```
 

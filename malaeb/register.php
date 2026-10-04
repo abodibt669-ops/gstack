@@ -15,17 +15,17 @@ if (isPost()) {
     // The form asks the browser to check these too, but the browser is not the
     // one we have to convince — anyone can post to this page directly.
     if (!valid_name($name)) {
-        $error = "Please enter your full name (2-100 characters).";
+        $error = __("Please enter your full name (2-100 characters).");
     } elseif (!valid_email($email)) {
-        $error = "Please enter a valid email address.";
+        $error = __("Please enter a valid email address.");
     } elseif (!valid_phone($phone)) {
-        $error = "Please enter a Saudi mobile number in the form 05XXXXXXXX.";
+        $error = __("Please enter a Saudi mobile number in the form 05XXXXXXXX.");
     } elseif (strlen($pass) < 8) {
-        $error = "Password must be at least 8 characters.";
+        $error = __("Password must be at least 8 characters.");
     } elseif (strlen($pass) > 200) {
         // bcrypt only reads the first 72 bytes; a huge password is just a way
         // to make the server do pointless work.
-        $error = "Password is too long.";
+        $error = __("Password is too long.");
     } else {
         $hash = password_hash($pass, PASSWORD_DEFAULT);
         $ins = $conn->prepare("INSERT INTO users (full_name, email, password, phone) VALUES (?, ?, ?, ?)");
@@ -45,7 +45,7 @@ if (isPost()) {
             redirect('courts.php');
         } catch (mysqli_sql_exception $e) {
             if ($e->getCode() === 1062) {   // duplicate entry
-                $error = "This email is already registered. Try logging in.";
+                $error = __("This email is already registered. Try logging in.");
             } else {
                 throw $e;
             }

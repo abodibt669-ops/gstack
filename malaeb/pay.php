@@ -20,28 +20,28 @@ $stmt->execute();
 $b = $stmt->get_result()->fetch_assoc();
 
 if (!$b) {
-    flash('error', 'Booking not found.');
+    flash('error', __('Booking not found.'));
     redirect('my_bookings.php');
 }
 if ($b['status'] === 'confirmed') {
-    flash('success', 'This booking is already paid.');
+    flash('success', __('This booking is already paid.'));
     redirect('my_bookings.php');
 }
 if ($b['status'] !== 'pending') {
-    flash('error', 'This booking can no longer be paid.');
+    flash('error', __('This booking can no longer be paid.'));
     redirect('my_bookings.php');
 }
 
 // Payments switched off on this server (see config/payments.php): say so
 // plainly instead of showing a checkout that could never succeed.
 if (!PAYMENTS_AVAILABLE) {
-    flash('error', 'Online payment is temporarily unavailable. Please try again later.');
+    flash('error', __('Online payment is temporarily unavailable. Please try again later.'));
     redirect('my_bookings.php');
 }
 
 $amountHalalas = payment_amount_halalas($b['total_price']);
 $amountLabel   = number_format((float)$b['total_price'], 2);
-$description   = $b['sport_type'] . ' — ' . $b['court_name']
+$description   = __($b['sport_type']) . ' — ' . $b['court_name']
                . ' (' . $b['booking_date'] . ' '
                . substr($b['start_time'], 0, 5) . '–' . substr($b['end_time'], 0, 5) . ')';
 
@@ -63,7 +63,7 @@ $callback = payment_url_to('payment_callback.php', ['booking_id' => (int)$b['boo
 $invoice  = moyasar_create_invoice($amountHalalas, $description, $callback, (int)$b['booking_id']);
 
 if (!$invoice['ok']) {
-    flash('error', 'Could not start payment right now. Please try again.');
+    flash('error', __('Could not start payment right now. Please try again.'));
     redirect('my_bookings.php');
 }
 

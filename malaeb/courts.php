@@ -35,20 +35,21 @@ $courts = $stmt->get_result();
 $sportOptions = '';
 foreach (SPORTS as $s) {
     $sel = $sport === $s ? ' selected' : '';
-    $sportOptions .= '<option value="' . e($s) . '"' . $sel . '>' . e($s) . '</option>';
+    $sportOptions .= '<option value="' . e($s) . '"' . $sel . '>' . e(__($s)) . '</option>';
 }
 
 // court cards
 $cards = '';
 if ($courts->num_rows === 0) {
-    $cards = '<p class="muted">No courts match your filter. Try widening the price or choosing another sport.</p>';
+    $cards = '<p class="muted">' . e(__('No courts match your filter. Try widening the price or choosing another sport.')) . '</p>';
 } else {
     while ($c = $courts->fetch_assoc()) {
         $action = $c['status'] === 'available'
-            ? '<a class="btn btn-dark btn-sm" href="booking.php?court_id=' . (int)$c['court_id'] . '">Book</a>'
-            : '<span class="badge-maint">Under maintenance</span>';
+            ? '<a class="btn btn-dark btn-sm" href="booking.php?court_id=' . (int)$c['court_id'] . '">' . e(__('Book')) . '</a>'
+            : '<span class="badge-maint">' . e(__('Under maintenance')) . '</span>';
         $cards .= view('partials/court_card.html', [
             'sport'    => $c['sport_type'],
+            'sport_label' => __($c['sport_type']),
             'name'     => $c['name'],
             'location' => $c['location'],
             'price'    => number_format((float)$c['price_per_hour'], 0),

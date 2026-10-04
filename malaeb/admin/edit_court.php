@@ -28,15 +28,15 @@ if (isPost() && $court) {
     $stat  = input($_POST, 'status');
 
     if ($name === '' || mb_strlen($name) > 100) {
-        $error = "Court name is required (up to 100 characters).";
+        $error = __("Court name is required (up to 100 characters).");
     } elseif (!valid_choice($sport, SPORTS)) {
-        $error = "Please choose a sport from the list.";
+        $error = __("Please choose a sport from the list.");
     } elseif ($loc === '' || mb_strlen($loc) > 150) {
-        $error = "Location is required (up to 150 characters).";
+        $error = __("Location is required (up to 150 characters).");
     } elseif (!is_numeric($price) || (float)$price <= 0 || (float)$price > 999999) {
-        $error = "Price must be a number greater than zero.";
+        $error = __("Price must be a number greater than zero.");
     } elseif (!valid_choice($stat, COURT_STATUSES)) {
-        $error = "Please choose a valid status.";
+        $error = __("Please choose a valid status.");
     } else {
         $priceValue = round((float)$price, 2);
         $upd = $conn->prepare(
@@ -47,27 +47,27 @@ if (isPost() && $court) {
 
         // Changing the price does not rewrite what existing customers were
         // already quoted: each booking keeps the total it was made at.
-        flash('success', "Court updated.");
+        flash('success', __("Court updated."));
         redirect('dashboard.php');
     }
 }
 
 if (!$court) {
     $content = view('partials/message.html', [
-        'body' => alert_error(raw('Court not found. <a href="dashboard.php">Back</a>.')),
+        'body' => alert_error(raw(e(__('Court not found.')) . ' <a href="dashboard.php">' . e(__('Back')) . '</a>')),
     ]);
 } else {
     // sport options with the current one selected
     $sportOptions = '';
     foreach (SPORTS as $s) {
         $sel = $sport === $s ? ' selected' : '';
-        $sportOptions .= '<option value="' . e($s) . '"' . $sel . '>' . e($s) . '</option>';
+        $sportOptions .= '<option value="' . e($s) . '"' . $sel . '>' . e(__($s)) . '</option>';
     }
     // status options with the current one selected
     $statusOptions = '';
     foreach (COURT_STATUSES as $val => $label) {
         $sel = $stat === $val ? ' selected' : '';
-        $statusOptions .= '<option value="' . e($val) . '"' . $sel . '>' . e($label) . '</option>';
+        $statusOptions .= '<option value="' . e($val) . '"' . $sel . '>' . e(__($label)) . '</option>';
     }
 
     $content = view('admin/edit_court.html', [

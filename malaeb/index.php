@@ -15,11 +15,12 @@ while ($c = $featured->fetch_assoc()) {
     // be attacked) because someone named a court with a stray < in it.
     $cards .= view('partials/court_card.html', [
         'sport'    => $c['sport_type'],
+        'sport_label' => __($c['sport_type']),
         'name'     => $c['name'],
         'location' => $c['location'],
         'price'    => number_format((float)$c['price_per_hour'], 0),
         'action'   => raw('<a class="btn btn-dark btn-sm" href="booking.php?court_id='
-                          . (int)$c['court_id'] . '">Book</a>'),
+                          . (int)$c['court_id'] . '">' . e(__('Book')) . '</a>'),
     ])->html;
 }
 
@@ -27,7 +28,7 @@ while ($c = $featured->fetch_assoc()) {
 // only ever submit a value the listing accepts.
 $sportOptions = '';
 foreach (SPORTS as $s) {
-    $sportOptions .= '<option value="' . e($s) . '">' . e($s) . '</option>';
+    $sportOptions .= '<option value="' . e($s) . '">' . e(__($s)) . '</option>';
 }
 
 // Real numbers, counted from the catalogue on every load — never hard-coded.

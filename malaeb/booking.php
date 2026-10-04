@@ -56,7 +56,7 @@ if (isPost() && $court) {
 
             if ((int)$chk->get_result()->fetch_assoc()['n'] > 0) {
                 $conn->rollback();
-                $error = "This time slot is already booked. Please choose another time.";
+                $error = __("This time slot is already booked. Please choose another time.");
             } else {
                 $total = round(slot_hours($start, $end) * (float)$court['price_per_hour'], 2);
                 // Saved as 'pending' (unpaid). It only becomes 'confirmed' after
@@ -84,14 +84,14 @@ if (isPost() && $court) {
 if (!$court) {
     // no court found -> show a message page
     $content = view('partials/message.html', [
-        'body' => alert_error(raw('Court not found or unavailable. <a href="courts.php">Back to courts</a>.')),
+        'body' => alert_error(raw(e(__('Court not found or unavailable.')) . ' <a href="courts.php">' . e(__('Back to courts')) . '</a>')),
     ]);
 } else {
     $alerts = take_flash()->html;
     if ($error) $alerts .= alert_error($error)->html;
 
     $content = view('booking.html', [
-        'sport'    => $court['sport_type'],
+        'sport'    => __($court['sport_type']),
         'name'     => $court['name'],
         'location' => $court['location'],
         'price'    => number_format((float)$court['price_per_hour'], 0),

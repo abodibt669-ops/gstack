@@ -1,41 +1,41 @@
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <p class="hero-eyebrow">Riyadh's sports courts, in one place</p>
-      <h1>Book the court.<br><em>Own the hour.</em></h1>
-      <p class="hero-lead">Wagti is the fastest way to book a sports court near you — football, padel, basketball, volleyball and tennis, all in one place. Compare prices and reserve in seconds.</p>
+      <p class="hero-eyebrow">{{t:Riyadh's sports courts, in one place}}</p>
+      <h1>{{t:Book the court.}}<br><em>{{t:Own the hour.}}</em></h1>
+      <p class="hero-lead">{{t:Wagti is the fastest way to book a sports court near you — football, padel, basketball, volleyball and tennis, all in one place. Compare prices and reserve in seconds.}}</p>
 
-      <form class="hero-search" method="GET" action="courts.php" role="search" aria-label="Find a court">
+      <form class="hero-search" method="GET" action="courts.php" role="search" aria-label="{{t:Find a court}}">
         <div class="hs-field">
-          <label for="hs-sport">Sport</label>
+          <label for="hs-sport">{{t:Sport}}</label>
           <select id="hs-sport" name="sport">
-            <option value="">Any sport</option>
+            <option value="">{{t:Any sport}}</option>
             {{sport_options}}
           </select>
         </div>
         <div class="hs-field">
-          <label for="hs-price">Budget per hour</label>
-          <input id="hs-price" type="number" name="max_price" min="0" placeholder="Any price">
+          <label for="hs-price">{{t:Budget per hour}}</label>
+          <input id="hs-price" type="number" name="max_price" min="0" placeholder="{{t:Any price}}">
         </div>
-        <button class="btn hs-go" type="submit">Find courts →</button>
+        <button class="btn hs-go" type="submit">{{t:Find courts →}}</button>
       </form>
-      <p class="hero-reassure">✓ Confirmed instantly — no phone calls, no waiting for a callback.</p>
+      <p class="hero-reassure">✓ {{t:Confirmed instantly — no phone calls, no waiting for a callback.}}</p>
 
-      <ul class="hero-stats" aria-label="At a glance">
-        <li><span class="hs-num">{{stat_sports}}</span><span class="hs-lbl">Sports</span></li>
-        <li><span class="hs-num">{{stat_districts}}</span><span class="hs-lbl">Riyadh districts</span></li>
-        <li><span class="hs-num">{{stat_price}}<small>SAR/hr</small></span><span class="hs-lbl">Starting from</span></li>
+      <ul class="hero-stats" aria-label="{{t:At a glance}}">
+        <li><span class="hs-num">{{stat_sports}}</span><span class="hs-lbl">{{t:Sports}}</span></li>
+        <li><span class="hs-num">{{stat_districts}}</span><span class="hs-lbl">{{t:Riyadh districts}}</span></li>
+        <li><span class="hs-num">{{stat_price}}<small>{{t:SAR/hr}}</small></span><span class="hs-lbl">{{t:Starting from}}</span></li>
       </ul>
     </div>
   </div>
 </section>
 
 <div class="marquee" aria-hidden="true">
-  <span class="track">FOOTBALL <b>◆</b> PADEL <b>◆</b> BASKETBALL <b>◆</b> VOLLEYBALL <b>◆</b> TENNIS <b>◆</b> BOOK IN SECONDS <b>◆</b> FOOTBALL <b>◆</b> PADEL <b>◆</b> BASKETBALL <b>◆</b> VOLLEYBALL <b>◆</b> TENNIS <b>◆</b> BOOK IN SECONDS <b>◆</b> </span>
+  <span class="track">{{t:FOOTBALL}} <b>◆</b> {{t:PADEL}} <b>◆</b> {{t:BASKETBALL}} <b>◆</b> {{t:VOLLEYBALL}} <b>◆</b> {{t:TENNIS}} <b>◆</b> {{t:BOOK IN SECONDS}} <b>◆</b> {{t:FOOTBALL}} <b>◆</b> {{t:PADEL}} <b>◆</b> {{t:BASKETBALL}} <b>◆</b> {{t:VOLLEYBALL}} <b>◆</b> {{t:TENNIS}} <b>◆</b> {{t:BOOK IN SECONDS}} <b>◆</b> </span>
 </div>
 
 <section class="section container">
-  <h2 class="section-title">Featured courts</h2>
+  <h2 class="section-title">{{t:Featured courts}}</h2>
   <div class="grid">
     {{cards}}
   </div>

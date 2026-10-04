@@ -17,15 +17,15 @@ if (isPost()) {
         $stmt->bind_param("i", $bid);
         $stmt->execute();
         $stmt->affected_rows
-            ? flash('success', "Booking cancelled.")
-            : flash('error', "That booking was not cancelled. It may already be cancelled.");
+            ? flash('success', __("Booking cancelled."))
+            : flash('error', __("That booking was not cancelled. It may already be cancelled."));
     } elseif ($action === 'delete') {
         $stmt = $conn->prepare("DELETE FROM bookings WHERE booking_id = ?");
         $stmt->bind_param("i", $bid);
         $stmt->execute();
         $stmt->affected_rows
-            ? flash('success', "Booking deleted.")
-            : flash('error', "That booking no longer exists.");
+            ? flash('success', __("Booking deleted."))
+            : flash('error', __("That booking no longer exists."));
     }
     redirect('bookings.php');
 }
@@ -44,10 +44,10 @@ while ($b = $data->fetch_assoc()) {
     $actions = '<div class="row-actions">';
     if ($b['status'] === 'confirmed') {
         $actions .= post_button('bookings.php', ['action' => 'cancel', 'booking_id' => $b['booking_id']],
-                      'Cancel', 'btn btn-dark btn-sm', 'Cancel this booking?')->html;
+                      __('Cancel'), 'btn btn-dark btn-sm', __('Cancel this booking?'))->html;
     }
     $actions .= post_button('bookings.php', ['action' => 'delete', 'booking_id' => $b['booking_id']],
-                  'Delete', 'btn btn-danger btn-sm', 'Permanently delete this record?')->html;
+                  __('Delete'), 'btn btn-danger btn-sm', __('Permanently delete this record?'))->html;
     $actions .= '</div>';
 
     $rows .= view('partials/admin_booking_row.html', [
@@ -58,7 +58,7 @@ while ($b = $data->fetch_assoc()) {
         'time'         => substr($b['start_time'], 0, 5) . ' - ' . substr($b['end_time'], 0, 5),
         'total'        => number_format((float)$b['total_price'], 2),
         'status_class' => $b['status'],
-        'status'       => ucfirst($b['status']),
+        'status'       => __(ucfirst($b['status'])),
         'actions'      => raw($actions),
     ])->html;
 }

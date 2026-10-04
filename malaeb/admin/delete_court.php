@@ -26,7 +26,7 @@ $chk->execute();
 $upcoming = (int)$chk->get_result()->fetch_assoc()['n'];
 
 if ($upcoming > 0) {
-    flash('error', "This court has {$upcoming} upcoming booking(s). Cancel them first, or set the court to maintenance instead.");
+    flash('error', __('This court has :count upcoming booking(s). Cancel them first, or set the court to maintenance instead.', ['count' => $upcoming]));
     redirect('dashboard.php');
 }
 
@@ -35,6 +35,6 @@ $stmt->bind_param("i", $id);
 $stmt->execute();
 
 $stmt->affected_rows
-    ? flash('success', "Court deleted.")
-    : flash('error', "That court no longer exists.");
+    ? flash('success', __("Court deleted."))
+    : flash('error', __("That court no longer exists."));
 redirect('dashboard.php');

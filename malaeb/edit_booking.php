@@ -33,7 +33,7 @@ if (isPost() && $booking) {
     if ($booking['court_status'] !== 'available') {
         // The court went into maintenance after the booking was made. Moving the
         // slot around is not something we should quietly allow.
-        $error = "This court is under maintenance. Please cancel the booking instead.";
+        $error = __("This court is under maintenance. Please cancel the booking instead.");
     } else {
         // Same rules as booking.php, including the past-date check this page
         // used to be missing entirely.
@@ -57,7 +57,7 @@ if (isPost() && $booking) {
 
             if ((int)$chk->get_result()->fetch_assoc()['n'] > 0) {
                 $conn->rollback();
-                $error = "This time slot is already booked.";
+                $error = __("This time slot is already booked.");
             } else {
                 $total = round(slot_hours($start, $end) * (float)$booking['price_per_hour'], 2);
                 $upd = $conn->prepare(
@@ -68,7 +68,7 @@ if (isPost() && $booking) {
                 $upd->execute();
                 $conn->commit();
 
-                flash('success', "Booking updated. New total: " . number_format($total, 2) . " SAR.");
+                flash('success', __('Booking updated. New total: :total SAR.', ['total' => number_format($total, 2)]));
                 redirect('my_bookings.php');
             }
         } catch (mysqli_sql_exception $e) {
@@ -80,7 +80,7 @@ if (isPost() && $booking) {
 
 if (!$booking) {
     $content = view('partials/message.html', [
-        'body' => alert_error(raw('Booking not found. <a href="my_bookings.php">Back</a>.')),
+        'body' => alert_error(raw(e(__('Booking not found.')) . ' <a href="my_bookings.php">' . e(__('Back')) . '</a>')),
     ]);
 } else {
     $content = view('edit_booking.html', [

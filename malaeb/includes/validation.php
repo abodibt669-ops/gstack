@@ -8,6 +8,8 @@
 
 defined('MALAEB') or exit('Direct access is not allowed.');
 
+require_once __DIR__ . '/i18n.php';
+
 // The sport and status lists live here once. They used to be typed out again in
 // courts.php, add_court.php and edit_court.php, so adding a sport meant
 // remembering three files — and the database ENUM was a silent fourth.
@@ -73,28 +75,28 @@ function valid_name(string $name): bool {
 // Returns an error message, or '' when everything is fine.
 function validate_slot(string $date, string $start, string $end): string {
     if (!valid_date($date)) {
-        return "Please choose a valid date.";
+        return __('Please choose a valid date.');
     }
     if (!valid_time($start) || !valid_time($end)) {
-        return "Please choose a valid start and end time.";
+        return __('Please choose a valid start and end time.');
     }
     if (!on_half_hour($start) || !on_half_hour($end)) {
-        return "Bookings start and end on the hour or half hour.";
+        return __('Bookings start and end on the hour or half hour.');
     }
     if (normalize_time($end) <= normalize_time($start)) {
-        return "End time must be after start time.";
+        return __('End time must be after start time.');
     }
 
     $today = new DateTimeImmutable('today');
     $day   = new DateTimeImmutable($date);
     if ($day < $today) {
-        return "You cannot book a date in the past.";
+        return __('You cannot book a date in the past.');
     }
     if ($day > $today->modify('+' . MAX_BOOKING_DAYS_AHEAD . ' days')) {
-        return "You can only book up to " . MAX_BOOKING_DAYS_AHEAD . " days ahead.";
+        return __('You can only book up to :days days ahead.', ['days' => MAX_BOOKING_DAYS_AHEAD]);
     }
     if (slot_hours($start, $end) > MAX_BOOKING_HOURS) {
-        return "A single booking can be at most " . MAX_BOOKING_HOURS . " hours.";
+        return __('A single booking can be at most :hours hours.', ['hours' => MAX_BOOKING_HOURS]);
     }
 
     return '';
